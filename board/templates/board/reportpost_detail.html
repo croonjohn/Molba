@@ -1,0 +1,14 @@
+{% extends 'board/base.html' %}
+
+{% block content %}
+    <div class="post">
+        {% if reportpost.published_date %}
+            <div class="date">
+                {{ reportpost.published_date }}
+            </div>
+        {% endif %}
+        <h1>{{ reportpost.title }}</h1>
+        <p>{{ reportpost.content|linebreaksbr }}</p>
+    </div>
+    <p>왜 안될까</p>
+{% endblock %}

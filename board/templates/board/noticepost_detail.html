@@ -1,0 +1,13 @@
+{% extends 'board/base.html' %}
+
+{% block content %}
+    <div class="post">
+        {% if noticepost.published_date %}
+            <div class="date">
+                {{ noticepost.published_date }}
+            </div>
+        {% endif %}
+        <h1>{{ noticepost.title }}</h1>
+        <p>{{ noticepost.content|linebreaksbr }}</p>
+    </div>
+{% endblock %}

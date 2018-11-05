@@ -1,0 +1,13 @@
+{% extends 'board/base.html' %}
+
+{% block content %}
+    {% for proposalpost in proposalposts %}
+        <div class="post">
+            <div class="date">
+                {{ proposalpost.published_date }}
+            </div>
+            <h1><a href="{% url 'proposalpost_detail' pk=proposalpost.pk %}">{{ proposalpost.title }}</a></h1>
+            <p>{{ proposalpost.content|linebreaksbr }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}

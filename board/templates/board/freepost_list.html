@@ -1,0 +1,13 @@
+{% extends 'board/base.html' %}
+
+{% block content %}
+    {% for freepost in freeposts %}
+        <div class="post">
+            <div class="date">
+                {{ freepost.published_date }}
+            </div>
+            <h1><a href="{% url 'freepost_detail' pk=freepost.pk %}">{{ freepost.title }}</a></h1>
+            <p>{{ freepost.content|linebreaksbr }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}

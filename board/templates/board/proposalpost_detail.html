@@ -1,0 +1,13 @@
+{% extends 'board/base.html' %}
+
+{% block content %}
+    <div class="post">
+        {% if proposalpost.published_date %}
+            <div class="date">
+                {{ proposalpost.published_date }}
+            </div>
+        {% endif %}
+        <h1>{{ proposalpost.title }}</h1>
+        <p>{{ proposalpost.content|linebreaksbr }}</p>
+    </div>
+{% endblock %}

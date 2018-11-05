@@ -1,0 +1,13 @@
+{% extends 'board/base.html' %}
+
+{% block content %}
+    {% for reportpost in reportposts %}
+        <div class="post">
+            <div class="date">
+                {{ reportpost.published_date }}
+            </div>
+            <h1><a href="{% url 'reportpost_detail' pk=reportpost.pk %}">{{ reportpost.title }}</a></h1>
+            <p>{{ reportpost.content|linebreaksbr }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}
