@@ -7,7 +7,12 @@
                 {{ freepost.published_date }}
             </div>
             <h1><a href="{% url 'freepost_detail' pk=freepost.pk %}">{{ freepost.title }}</a></h1>
+            <p>{{ freepost.author }}</p>
             <p>{{ freepost.content|linebreaksbr }}</p>
+            <a href="{% url 'freepost_detail' pk=freepost.pk %}">댓글: {{ freepost.freecomments.count }}</a>
         </div>
     {% endfor %}
+    {% if user.is_authenticated %}
+        <a href="{% url 'freepost_new' %}" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a>
+    {% endif %}
 {% endblock %}

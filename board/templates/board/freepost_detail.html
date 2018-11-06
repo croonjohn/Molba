@@ -7,7 +7,34 @@
                 {{ freepost.published_date }}
             </div>
         {% endif %}
+
+        {% if user.is_authenticated %}
+            <a class="btn btn-default" href="{% url 'freepost_edit' pk=freepost.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
+            <a class="btn btn-default" href="{% url 'freepost_remove' pk=freepost.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
+        {% endif %}
+
         <h1>{{ freepost.title }}</h1>
         <p>{{ freepost.content|linebreaksbr }}</p>
     </div>
+    <hr>
+    {% if user.is_authenticated %}
+        <form method="POST" class="post-form" action="{% url 'add_freecomment_to_freepost' pk=freepost.pk %}">
+            {% csrf_token %}
+            <input type="text" name="freecomment">
+            <button type="submit" class="save btn btn-default">등록</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}" class="top-menu">로그인</a> 후 댓글 달기</p>
+    {% endif %}
+    {% for freecomment in freepost.freecomments.all %}
+        <div class="comment">
+            <div class="date">{{ freecomment.published_date }}</div>
+            <strong>{{ freecomment.author }}</strong>
+            <p>수정횟수: {{ freecomment.number_of_edits }}</p>
+            <p>마지막 수정일시: {{ freecomment.last_edit_date }}</p>
+            <p>{{ freecomment.content|linebreaks }}</p>
+        </div>
+    {% empty %}
+        <p>댓글이 없습니다.</p>
+    {% endfor %}
 {% endblock %}

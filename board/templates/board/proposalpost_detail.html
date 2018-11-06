@@ -7,7 +7,22 @@
                 {{ proposalpost.published_date }}
             </div>
         {% endif %}
+        <a class="btn btn-default" href="{% url 'proposalpost_edit' pk=proposalpost.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
+        <a class="btn btn-default" href="{% url 'proposalpost_remove' pk=proposalpost.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
         <h1>{{ proposalpost.title }}</h1>
         <p>{{ proposalpost.content|linebreaksbr }}</p>
     </div>
+    <hr>
+    <a class="btn btn-default" href="{% url 'add_proposalcomment_to_proposalpost' pk=proposalpost.pk %}">댓글 달기</a>
+    {% for proposalcomment in proposalpost.proposalcomments.all %}
+        <div class="comment">
+            <div class="date">{{ proposalcomment.published_date }}</div>
+            <strong>{{ proposalcomment.author }}</strong>
+            <p>수정횟수: {{ proposalcomment.number_of_edits }}</p>
+            <p>마지막 수정일시: {{ proposalcomment.last_edit_date }}</p>
+            <p>{{ proposalcomment.content|linebreaks }}</p>
+        </div>
+    {% empty %}
+        <p>댓글이 없습니다.</p>
+    {% endfor %}
 {% endblock %}

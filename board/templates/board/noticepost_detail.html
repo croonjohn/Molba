@@ -7,7 +7,22 @@
                 {{ noticepost.published_date }}
             </div>
         {% endif %}
+        <a class="btn btn-default" href="{% url 'noticepost_edit' pk=noticepost.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
+        <a class="btn btn-default" href="{% url 'noticepost_remove' pk=noticepost.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
         <h1>{{ noticepost.title }}</h1>
         <p>{{ noticepost.content|linebreaksbr }}</p>
     </div>
+    <hr>
+    <a class="btn btn-default" href="{% url 'add_noticecomment_to_noticepost' pk=noticepost.pk %}">댓글 달기</a>
+    {% for noticecomment in noticepost.noticecomments.all %}
+        <div class="comment">
+            <div class="date">{{ noticecomment.published_date }}</div>
+            <strong>{{ noticecomment.author }}</strong>
+            <p>수정횟수: {{ noticecomment.number_of_edits }}</p>
+            <p>마지막 수정일시: {{ noticecomment.last_edit_date }}</p>
+            <p>{{ noticecomment.content|linebreaks }}</p>
+        </div>
+    {% empty %}
+        <p>댓글이 없습니다.</p>
+    {% endfor %}
 {% endblock %}

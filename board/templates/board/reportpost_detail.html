@@ -7,8 +7,22 @@
                 {{ reportpost.published_date }}
             </div>
         {% endif %}
+        <a class="btn btn-default" href="{% url 'reportpost_edit' pk=reportpost.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
+        <a class="btn btn-default" href="{% url 'reportpost_remove' pk=reportpost.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
         <h1>{{ reportpost.title }}</h1>
         <p>{{ reportpost.content|linebreaksbr }}</p>
     </div>
-    <p>왜 안될까</p>
+    <hr>
+    <a class="btn btn-default" href="{% url 'add_reportcomment_to_reportpost' pk=reportpost.pk %}">댓글 달기</a>
+    {% for reportcomment in reportpost.reportcomments.all %}
+        <div class="comment">
+            <div class="date">{{ reportcomment.published_date }}</div>
+            <strong>{{ reportcomment.author }}</strong>
+            <p>수정횟수: {{ reportcomment.number_of_edits }}</p>
+            <p>마지막 수정일시: {{ reportcomment.last_edit_date }}</p>
+            <p>{{ reportcomment.content|linebreaks }}</p>
+        </div>
+    {% empty %}
+        <p>댓글이 없습니다.</p>
+    {% endfor %}
 {% endblock %}

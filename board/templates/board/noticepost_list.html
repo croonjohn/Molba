@@ -8,6 +8,11 @@
             </div>
             <h1><a href="{% url 'noticepost_detail' pk=noticepost.pk %}">{{ noticepost.title }}</a></h1>
             <p>{{ noticepost.content|linebreaksbr }}</p>
+            <a href="{% url 'noticepost_detail' pk=noticepost.pk %}">댓글: {{ noticepost.noticecomments.count }}</a>
         </div>
     {% endfor %}
+    
+    {% if user.is_authenticated %}
+        <a href="{% url 'noticepost_new' %}" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a>
+    {% endif %}
 {% endblock %}
