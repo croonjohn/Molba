@@ -1,0 +1,51 @@
+{% extends 'board/base.html' %}
+
+{% block content %}
+    <h2>작성 댓글 목록</h2>
+    {% for membercomment in membercomments %}
+    <div class="post">
+        <div class="date">
+            {{ membercomment.published_date }}
+        </div>
+        <div class="likes_and_hates">좋아요: {{ membercomment.total_likes }} 싫어요: {{ membercomment.total_hates }}</div>   
+        <p>{{ membercomment.author }}</p>
+        {% if membercomment.post.board == "Free" %}
+            <a href="{% url 'freepost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
+        {% elif membercomment.post.board == "Report" %}
+            <a href="{% url 'reportpost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
+        {% elif membercomment.post.board == "Proposal" %}
+            <a href="{% url 'proposalpost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
+        {% else %}
+            <a href="{% url 'noticepost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
+        {% endif %}
+    </div>
+    {% endfor %}
+    <!-- pagination dispaly by Rob L from Stack Overflow -->
+    <ul class="pagination">
+            <li><a href="?page=1">&laquo; 첫 페이지</a></li>
+            {% if membercomments.has_previous %}
+                <li><a href="?page={{ membercomments.previous_page_number }}">이전</a></li>
+            {% endif %}
+            
+            {% if membercomments.number|add:'-4' > 1 %}
+            <li><a href="?page={{ membercomments.number|add:'-5' }}">&hellip;</a></li>
+            {% endif %}
+            
+            {% for i in membercomments.paginator.page_range %}
+                {% if memberpcomments.number == i %}
+                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% elif i > membercomments.number|add:'-5' and i < membercomments.number|add:'5' %}
+                    <li><a href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if membercomments.paginator.num_pages > membercomments.number|add:'4' %}
+                <li><a href="?page={{ membercomments.number|add:'5' }}">&hellip;</a></li>
+            {% endif %}
+    
+            {% if membercomments.has_next %}
+                <li><a href="?page={{ membercomments.next_page_number }}">다음</a></li>
+            {% endif %}
+            <li><a href="?page={{ membercomments.paginator.num_pages }}">끝 페이지 &raquo;</a></li>
+        </ul>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'board/base.html' %}
+{% load hitcount_tags %}
+
+{% block content %}
+    <h2>작성 글 목록</h2>
+    {% for memberpost in memberposts %}
+    <div class="post">
+        <div class="date">
+            {{ memberpost.published_date }}
+        </div>
+        <div class="hitcount">
+            조회수: {% get_hit_count for memberpost %}
+        </div>
+        <div class="likes_and_hates">좋아요: {{ memberpost.total_likes }} 싫어요: {{ memberpost.total_hates }}</div>   
+        <p>{{ memberpost.author }}</p>
+        {% if memberpost.board == "Free" %}
+            <a href="{% url 'freepost_detail' pk=memberpost.pk %}">{{ memberpost.title }} [{{ memberpost.freecomments.count }}]</a>
+        {% elif memberpost.board == "Report" %}
+            <a href="{% url 'reportpost_detail' pk=memberpost.pk %}">{{ memberpost.title }} [{{ memberpost.reportcomments.count }}]</a>
+        {% elif memberpost.board == "Proposal" %}
+            <a href="{% url 'proposalpost_detail' pk=memberpost.pk %}">{{ memberpost.title }} [{{ memberpost.proposalcomments.count }}]</a>
+        {% else %}
+            <a href="{% url 'noticepost_detail' pk=memberpost.pk %}">{{ memberpost.title }} [{{ memberpost.noticecomments.count }}]</a>
+        {% endif %}
+    </div>
+    {% endfor %}
+    <!-- pagination dispaly by Rob L from Stack Overflow -->
+    <ul class="pagination">
+            <li><a href="?page=1">&laquo; 첫 페이지</a></li>
+            {% if memberposts.has_previous %}
+                <li><a href="?page={{ memberposts.previous_page_number }}">이전</a></li>
+            {% endif %}
+            
+            {% if memberposts.number|add:'-4' > 1 %}
+            <li><a href="?page={{ memberposts.number|add:'-5' }}">&hellip;</a></li>
+            {% endif %}
+            
+            {% for i in memberposts.paginator.page_range %}
+                {% if memberposts.number == i %}
+                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% elif i > memberposts.number|add:'-5' and i < memberposts.number|add:'5' %}
+                    <li><a href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if memberposts.paginator.num_pages > memberposts.number|add:'4' %}
+                <li><a href="?page={{ memberposts.number|add:'5' }}">&hellip;</a></li>
+            {% endif %}
+    
+            {% if memberposts.has_next %}
+                <li><a href="?page={{ memberposts.next_page_number }}">다음</a></li>
+            {% endif %}
+            <li><a href="?page={{ memberposts.paginator.num_pages }}">끝 페이지 &raquo;</a></li>
+        </ul>
+{% endblock %}

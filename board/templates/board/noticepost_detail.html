@@ -7,8 +7,10 @@
                 {{ noticepost.published_date }}
             </div>
         {% endif %}
-        <a class="btn btn-default" href="{% url 'noticepost_edit' pk=noticepost.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
-        <a class="btn btn-default" href="{% url 'noticepost_remove' pk=noticepost.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
+        {% if user.is_authenticated %}
+            <a class="btn btn-default" href="{% url 'noticepost_edit' pk=noticepost.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
+            <a class="btn btn-default" href="{% url 'noticepost_remove' pk=noticepost.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
+        {% endif %}
         <h1>{{ noticepost.title }}</h1>
         <p>{{ noticepost.content|linebreaksbr }}</p>
     </div>

@@ -1,0 +1,9 @@
+{% extends 'board/base.html' %}
+
+{% block content %}
+<h2>회원정보</h2>
+<p>아이디: {{ member.username }}</p>
+<p>가입일: </p>
+<p>마지막 로그인 일시: {{ member.last_login }}</p>
+<button type="button">회원정보 변경</button>
+{% endblock %}

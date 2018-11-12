@@ -31,13 +31,14 @@ ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com']
 # Application definition
 
 INSTALLED_APPS = [
+    'board',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'board',
+    'hitcount',
 ]
 
 MIDDLEWARE = [
@@ -125,3 +126,7 @@ MEDIA_URL = '/upload_files/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 
 LOGIN_REDIRECT_URL = '/'
+
+# django-hitcount settings
+# https://django-hitcount.readthedocs.io/en/latest/settings.html
+HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 0 }

@@ -7,10 +7,13 @@
                 {{ reportpost.published_date }}
             </div>
         {% endif %}
-        <a class="btn btn-default" href="{% url 'reportpost_edit' pk=reportpost.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
-        <a class="btn btn-default" href="{% url 'reportpost_remove' pk=reportpost.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
+        {% if user.is_authenticated %}
+            <a class="btn btn-default" href="{% url 'reportpost_edit' pk=reportpost.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
+            <a class="btn btn-default" href="{% url 'reportpost_remove' pk=reportpost.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
+        {% endif %}
         <h1>{{ reportpost.title }}</h1>
         <p>{{ reportpost.content|linebreaksbr }}</p>
+        <img>{{ reportpost.image }}
     </div>
     <hr>
     <a class="btn btn-default" href="{% url 'add_reportcomment_to_reportpost' pk=reportpost.pk %}">댓글 달기</a>
