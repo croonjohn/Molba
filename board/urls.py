@@ -28,7 +28,7 @@ urlpatterns = [
     path('notice/<int:pk>/remove/', views.noticepost_remove, name='noticepost_remove'),
     path('free/<int:pk>/comment/', views.add_freecomment_to_freepost, name='add_freecomment_to_freepost'),
     path('report/<int:pk>/comment/', views.add_reportcomment_to_reportpost, name='add_reportcomment_to_reportpost'),
-    path('proposal/<int:pk>/comment/', views.add_proposalcomment_to_proposalpost, name='add_proposalcommnet_to_proposalpost'),
+    path('proposal/<int:pk>/comment/', views.add_proposalcomment_to_proposalpost, name='add_proposalcomment_to_proposalpost'),
     path('notice/<int:pk>/comment/', views.add_noticecomment_to_noticepost, name='add_noticecomment_to_noticepost'),
     path('signup/', views.signup, name='signup'),
     path('freepost_like/', views.freepost_like, name='freepost_like'),
@@ -58,6 +58,7 @@ urlpatterns = [
     path('member/posts/', views.memberpost_list, name='memberpost_list'),
     path('member/comments/', views.membercomment_list, name='membercomment_list'),
     path('member/info/', views.member_info, name='member_info'),
+    path('member/info/change', views.member_info_change, name='member_info_change'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

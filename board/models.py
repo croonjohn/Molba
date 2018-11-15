@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class AbstractPost(models.Model):
     title = models.CharField(max_length=200)
     author = models.ForeignKey('auth.User', on_delete=models.CASCADE, default=None, null=True, blank=True)
-    published_date = models.DateTimeField(auto_now_add=True)
+    published_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     content = models.TextField()
     last_edit_date = models.DateTimeField(auto_now=True)
     number_of_edits = models.IntegerField(blank=True, null=False, default=0)
@@ -29,6 +29,20 @@ class AbstractPost(models.Model):
     @property
     def total_hates(self):
         return self.hates.count()
+    
+    @property
+    def likes_minus_hates(self):
+        return (self.likes.count()-self.hates.count())
+
+    @property
+    def published_date_for_board(self):
+        today = timezone.now().date()
+        if self.published_date.date() == today:
+            return self.published_date.strftime('%H:%M')
+        else:
+            return self.published_date.strftime('%y.%m.%d')
+        
+
 
 class FreePost(AbstractPost):
     likes = models.ManyToManyField(User, related_name='freepost_likes', blank=True, null=True)
@@ -71,6 +85,10 @@ class ReportPost(AbstractPost):
 
     class Meta:
         abstract = False
+    
+    @property
+    def show_area(self):
+        return self.get_area_display()
 
 class ProposalPost(AbstractPost):
     PR_CHOICES = (
@@ -85,6 +103,10 @@ class ProposalPost(AbstractPost):
 
     class Meta:
         abstract = False
+
+    @property
+    def show_proposal_type(self):
+        return self.get_proposal_type_display()
 
 class NoticePost(AbstractPost):
     NOTICE_CHOICES = (

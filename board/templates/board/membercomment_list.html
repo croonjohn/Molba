@@ -8,7 +8,6 @@
             {{ membercomment.published_date }}
         </div>
         <div class="likes_and_hates">좋아요: {{ membercomment.total_likes }} 싫어요: {{ membercomment.total_hates }}</div>   
-        <p>{{ membercomment.author }}</p>
         {% if membercomment.post.board == "Free" %}
             <a href="{% url 'freepost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
         {% elif membercomment.post.board == "Report" %}
@@ -32,7 +31,7 @@
             {% endif %}
             
             {% for i in membercomments.paginator.page_range %}
-                {% if memberpcomments.number == i %}
+                {% if membercomments.number == i %}
                     <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
                 {% elif i > membercomments.number|add:'-5' and i < membercomments.number|add:'5' %}
                     <li><a href="?page={{ i }}">{{ i }}</a></li>

@@ -80,12 +80,28 @@ class UserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('username', 'password')
+        fields = ('username', 'nickname','password')
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'150자 이내로 입력 가능합니다.'}),
+            'nickname': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'150자 이내로 입력 가능합니다.'}),
             'password' : forms.PasswordInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'username': '아이디',
+            'nickname': '닉네임',
+            'password': '비밀번호'
+        }
+
+class UserChangeForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ('nickname','password')
+        widgets = {
+            'nickname': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'150자 이내로 입력 가능합니다.'}),
+            'password' : forms.PasswordInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'nickname': '닉네임',
             'password': '비밀번호'
         }

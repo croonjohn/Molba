@@ -1,0 +1,128 @@
+body {
+    width: 100%;
+    font-family: 'Nanum Gothic', sans-serif !important;
+    font-weight: 500 !important;
+}
+
+@media only screen and (min-width: 1024px){
+    #wrapper {
+        width: 820px;
+        margin: 0 auto;
+        position: relative;
+        min-height: 100%;
+    }
+
+    header {
+        margin: 2em 0;
+    }
+
+    .top-menu {
+        display: inline-block;
+        margin: 0 10px;
+    }
+
+    nav {
+        width: 100%;
+        height: 40px;
+        position: relative;
+        background-color: #0055FF;
+        border-radius: 5px;
+    }
+
+    nav ul {
+        width: 80%;
+        margin-top: 8px;
+        display: inline-block;
+    }
+    
+    nav ul li {
+        left: 0;
+        width: 130px;
+        text-align: center;
+        display: inline-block;
+        font-size: 16px;
+        font-weight: 600 !important;
+        margin-left: -24px;
+        margin-right: 36px;
+    }
+
+    nav .search-bar {
+        width: 15%;
+        display: inline-block;
+        margin: 0 0 0 3%;
+        background: white;
+    }
+
+    nav .search-bar input {
+        width: 99px;
+    }
+
+    .search-bar input {
+        width: 160px;
+    }
+
+    .search-bar button {
+        background: url("images/search.png") no-repeat;
+        background-size: contain;
+        border: none;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+}
+
+header h1 {
+    display: inline-block;
+}
+
+.member-menu {
+    display: inline-block;
+    position: absolute;
+    right: 0;
+}
+
+.search-bar {
+    display: inline-block;
+}
+
+.site-title {
+    color: red;
+    font-size: 1em;
+}
+
+nav ul {
+    list-style: none;
+}
+
+nav ul li a, nav ul li a:active, nav ul li a:visited, nav ul li a:hover {
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+.bottom-bar {
+    position: relative;
+}
+
+.bottom-bar .new-post {
+    position: absolute;
+    display: inline-block;
+    right: 0;
+}
+
+footer {
+    width: 100%;
+    height: 0.1em;
+    border-top: solid gray 0.1em;
+    margin-top: 2em;
+    position: absolute;
+    bottom: 0;
+}
+
+.footer-box {
+    height: 3em;
+}
+
+.board-table {
+    width: 100%;
+}

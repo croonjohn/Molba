@@ -4,7 +4,7 @@ from .models import (
     )
 from django.utils import timezone
 from .forms import (
-    FreePostForm, ReportPostForm, ProposalPostForm, NoticePostForm, FreeCommentForm, ReportCommentForm, ProposalCommentForm, NoticeCommentForm, UserForm
+    FreePostForm, ReportPostForm, ProposalPostForm, NoticePostForm, FreeCommentForm, ReportCommentForm, ProposalCommentForm, NoticeCommentForm, UserForm, UserChangeForm
 )
 from django.contrib.auth.models import User
 from django.contrib.auth import login
@@ -25,24 +25,27 @@ from itertools import chain
 
 def freepost_list(request):
     freepost_listing = FreePost.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
+    notice_tops = NoticePost.objects.filter(notice_type=1, published_date__lte=timezone.now()).order_by('-published_date')
     paginator = Paginator(freepost_listing, 10)
     page = request.GET.get('page')
     freeposts = paginator.get_page(page)
-    return render(request,'board/freepost_list.html', {'freeposts': freeposts})
+    return render(request,'board/freepost_list.html', {'freeposts': freeposts, 'notice_tops': notice_tops})
 
 def reportpost_list(request):
     reportpost_listing = ReportPost.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
+    notice_tops = NoticePost.objects.filter(notice_type=1, published_date__lte=timezone.now()).order_by('-published_date')
     paginator = Paginator(reportpost_listing, 10)
     page = request.GET.get('page')
     reportposts = paginator.get_page(page)
-    return render(request, 'board/reportpost_list.html', {'reportposts': reportposts})
+    return render(request, 'board/reportpost_list.html', {'reportposts': reportposts, 'notice_tops': notice_tops})
 
 def proposalpost_list(request):
     proposalpost_listing = ProposalPost.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
+    notice_tops = NoticePost.objects.filter(notice_type=1, published_date__lte=timezone.now()).order_by('-published_date')
     paginator = Paginator(proposalpost_listing, 10)
     page = request.GET.get('page')
     proposalposts = paginator.get_page(page)
-    return render(request, 'board/proposalpost_list.html', {'proposalposts': proposalposts})
+    return render(request, 'board/proposalpost_list.html', {'proposalposts': proposalposts, 'notice_tops': notice_tops})
 
 def noticepost_list(request):
     noticepost_listing = NoticePost.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
@@ -84,6 +87,19 @@ def member_info(request):
     member = request.user
     return render(request, 'board/member_info.html', {'member': member})
 
+login_required
+def member_info_change(request):
+    member = request.user
+    if request.method == "POST":
+        form = UserChangeForm(request.POST, instance=member)
+        if form.is_valid():
+            member = form.save(commit=False)
+            member.save()
+            message = "회원정보가 변경되었습니다."
+            return redirect('member_info')
+    else:
+        form = UserChangeForm(instance=member)
+        return render(request, 'board/member_info_change.html', {'form': form})
 
 def home(request):
     return render(request, 'board/home.html')
@@ -169,7 +185,7 @@ def noticepost_new(request):
 def freepost_edit(request, pk):
     post = get_object_or_404(FreePost, pk=pk)
     if request.method == "POST":
-        form = FreePostForm(request.POST, instance=post)
+        form = FreePostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -188,7 +204,7 @@ def freepost_edit(request, pk):
 def reportpost_edit(request, pk):
     post = get_object_or_404(ReportPost, pk=pk)
     if request.method == "POST":
-        form = ReportPostForm(request.POST, instance=post)
+        form = ReportPostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -207,7 +223,7 @@ def reportpost_edit(request, pk):
 def proposalpost_edit(request, pk):
     post = get_object_or_404(ProposalPost, pk=pk)
     if request.method == "POST":
-        form = ProposalPostForm(request.POST, instance=post)
+        form = ProposalPostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -227,7 +243,7 @@ def proposalpost_edit(request, pk):
 def noticepost_edit(request, pk):
     post = get_object_or_404(NoticePost, pk=pk)
     if request.method == "POST":
-        form = NoticePostForm(request.POST, instance=post)
+        form = NoticePostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -442,7 +458,7 @@ def reportpost_hate(request):
         reportpost_id = request.POST.get('pk', None)
         reportpost = ReportPost.objects.get(pk = reportpost_id)
 
-        if user == freepost.author:
+        if user == reportpost.author:
             message = '자신의 글은 싫어요 하실 수 없습니다'
         else:
             if reportpost.hates.filter(id = user.id).exists():
@@ -465,7 +481,7 @@ def proposalpost_like(request):
         proposalpost_id = request.POST.get('pk', None)
         proposalpost = ProposalPost.objects.get(pk = proposalpost_id)
 
-        if user == freepost.author:
+        if user == proposalpost.author:
             message = '자신의 글은 좋아요 하실 수 없습니다'
         else:
             if proposalpost.likes.filter(id = user.id).exists():
@@ -488,7 +504,7 @@ def proposalpost_hate(request):
         proposalpost_id = request.POST.get('pk', None)
         proposalpost = ProposalPost.objects.get(pk = proposalpost_id)
 
-        if user == freepost.author:
+        if user == proposalpost.author:
             message = '자신의 글은 싫어요 하실 수 없습니다'
         else:
             if proposalpost.hates.filter(id = user.id).exists():
@@ -511,7 +527,7 @@ def noticepost_like(request):
         noticepost_id = request.POST.get('pk', None)
         noticepost = NoticePost.objects.get(pk = noticepost_id)
 
-        if user == freepost.author:
+        if user == noticepost.author:
             message = '자신의 글은 좋아요 하실 수 없습니다'
         else:
             if noticepost.likes.filter(id = user.id).exists():
@@ -534,7 +550,7 @@ def noticepost_hate(request):
         noticepost_id = request.POST.get('pk', None)
         noticepost = NoticePost.objects.get(pk = noticepost_id)
 
-        if user == freepost.author:
+        if user == noticepost.author:
             message = '자신의 글은 싫어요 하실 수 없습니다'
         else:
             if noticepost.hates.filter(id = user.id).exists():

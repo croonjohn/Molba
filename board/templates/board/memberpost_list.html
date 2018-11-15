@@ -3,27 +3,64 @@
 
 {% block content %}
     <h2>작성 글 목록</h2>
-    {% for memberpost in memberposts %}
-    <div class="post">
-        <div class="date">
-            {{ memberpost.published_date }}
-        </div>
-        <div class="hitcount">
-            조회수: {% get_hit_count for memberpost %}
-        </div>
-        <div class="likes_and_hates">좋아요: {{ memberpost.total_likes }} 싫어요: {{ memberpost.total_hates }}</div>   
-        <p>{{ memberpost.author }}</p>
-        {% if memberpost.board == "Free" %}
-            <a href="{% url 'freepost_detail' pk=memberpost.pk %}">{{ memberpost.title }} [{{ memberpost.freecomments.count }}]</a>
-        {% elif memberpost.board == "Report" %}
-            <a href="{% url 'reportpost_detail' pk=memberpost.pk %}">{{ memberpost.title }} [{{ memberpost.reportcomments.count }}]</a>
-        {% elif memberpost.board == "Proposal" %}
-            <a href="{% url 'proposalpost_detail' pk=memberpost.pk %}">{{ memberpost.title }} [{{ memberpost.proposalcomments.count }}]</a>
-        {% else %}
-            <a href="{% url 'noticepost_detail' pk=memberpost.pk %}">{{ memberpost.title }} [{{ memberpost.noticecomments.count }}]</a>
-        {% endif %}
-    </div>
-    {% endfor %}
+    <table class="board-table">
+        <tr>
+            <th>제목</th>
+            <th>날짜</th>
+            <th>조회</th>
+            <th>추천</th>
+        </tr>
+        {% for memberpost in memberposts %}
+        <tr>
+            <div class="post">
+                <td>
+                    {% if memberpost.board == "Free" %}
+                        <a href="{% url 'freepost_detail' pk=memberpost.pk %}">
+                            {{ memberpost.title }} 
+                            {% if memberpost.freecomments.count %}
+                                [{{ memberpost.freecomments.count }}]
+                            {% endif %}
+                        </a>
+                    {% elif memberpost.board == "Report" %}
+                        <a href="{% url 'reportpost_detail' pk=memberpost.pk %}">
+                            [{{  reportpost.show_area}}] [ {{ reportpost.specific_area }} ] {{ reportpost.title }}
+                            {% if reportpost.reportcomments.count %}
+                                [{{ reportpost.reportcomments.count }}]
+                            {% endif %}
+                        </a>
+                    {% elif memberpost.board == "Proposal" %}
+                        <a href="{% url 'proposalpost_detail' pk=memberpost.pk %}">
+                            [{{  proposalpost.show_proposal_type}}] {{ proposalpost.title }}
+                            {% if proposalpost.proposalcomments.count %}
+                                [{{ proposalpost.proposalcomments.count }}]
+                            {% endif %}
+                        </a>
+                    {% else %}
+                        <a href="{% url 'noticepost_detail' pk=memberpost.pk %}">
+                            {{ memberpost.title }}
+                            {% if memberpost.noticecomments.count %}
+                                [{{ memberpost.noticecomments.count }}]
+                            {% endif %}
+                        </a>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="date">
+                            {{ memberpost.published_date_for_board }}
+                    </div>
+                </td>
+                <td>
+                    <div class="hitcount">
+                            조회수: {% get_hit_count for memberpost %}
+                    </div>
+                </td>
+                <td>
+                    <div class="likes_and_hates">{{ memberpost.likes_minus_hates }}</div>   
+                </td>
+            </div>
+        </tr>
+        {% endfor %}
+    </table>
     <!-- pagination dispaly by Rob L from Stack Overflow -->
     <ul class="pagination">
             <li><a href="?page=1">&laquo; 첫 페이지</a></li>
