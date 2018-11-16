@@ -17,7 +17,7 @@
         {% for notice_top in notice_tops %}
             <tr>
                 <div class="notice">
-                    <td><a class="title" href="{% url 'noticepost_detail' pk=notice_top.pk %}">[공지] {{ notice_top.title }}</a></td>
+                    <td class="title"><a href="{% url 'noticepost_detail' pk=notice_top.pk %}">[공지] {{ notice_top.title }}</a></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -28,8 +28,8 @@
         {% for freepost in freeposts %}
         <tr>
             <div class="post">
-                <td>
-                    <a class="title" href="{% url 'freepost_detail' pk=freepost.pk %}">
+                <td class="title">
+                    <a href="{% url 'freepost_detail' pk=freepost.pk %}">
                         {{ freepost.title }}
                         {% if freepost.freecomments.count %}
                             [{{ freepost.freecomments.count }}]
@@ -46,7 +46,7 @@
                 </td>
                 <td>
                     <div class="hitcount">
-                    조회수: {% get_hit_count for freepost %}
+                        {% get_hit_count for freepost %}
                     </div>
                 </td>
                 <td>
@@ -68,6 +68,7 @@
                     <option value="content">내용</option>
                     <option value="title-content">제목+내용</option>
                     <option value="nickname">닉네임</option>
+                    <option value="date">날짜</option>
                 </select>
         </div>
         {% if user.is_authenticated %}

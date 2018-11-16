@@ -19,7 +19,7 @@
         {% for notice_top in notice_tops %}
             <tr>
                 <div class="notice">
-                    <td><a class="title" href="{% url 'noticepost_detail' pk=notice_top.pk %}">[공지] {{ notice_top.title }}</a></td>
+                    <td class="title"><a href="{% url 'noticepost_detail' pk=notice_top.pk %}">[공지] {{ notice_top.title }}</a></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -30,8 +30,8 @@
         {% for proposalpost in proposalposts %}
         <tr>
             <div class="post">
-                <td>
-                    <a class="title" href="{% url 'proposalpost_detail' pk=proposalpost.pk %}">
+                <td class="title">
+                    <a href="{% url 'proposalpost_detail' pk=proposalpost.pk %}">
                         [{{  proposalpost.show_proposal_type}}] {{ proposalpost.title }}
                         {% if proposalpost.proposalcomments.count %}
                             [{{ proposalpost.proposalcomments.count }}]
@@ -48,7 +48,7 @@
                 </td>
                 <td>
                     <div class="hitcount">
-                    조회수: {% get_hit_count for proposalpost %}
+                        {% get_hit_count for proposalpost %}
                     </div>
                 </td>
                 <td>
@@ -70,6 +70,7 @@
                     <option value="content">내용</option>
                     <option value="title-content">제목+내용</option>
                     <option value="nickname">닉네임</option>
+                    <option value="date">날짜</option>
                 </select>
         </div>
         {% if user.is_authenticated %}
