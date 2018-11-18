@@ -2,24 +2,26 @@
 
 <html lang="ko">
     <head>
-        <title>뭘봐</title>
+        <title>Django Board</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="{% static 'css/board.css' %}">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
         <link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
         <link href="https://fonts.googleapis.com/css?family=Nanum+Gothic" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Black+And+White+Picture" rel="stylesheet">
         <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
         <script src="{% static 'hitcount/jquery.postcsrf.js' %}"></script>
     </head>
     <body>
         <div id="wrapper">
             <header>
-                <h1><a class="site-title" href="/">뭘봐</a></h1>
+                <h1><a class="site-title" href="/">Django Board</a></h1>
                 <div class="member-menu">
                     {% if user.is_authenticated %}
-                    <p class="top-menu"><span id="user_name">{{ user.username }}</span>님, 안녕하세요 <small>(<a href="{% url 'logout' %}">로그아웃</a>)</small></p>
+                    <p class="top-menu"><span id="user_name">{{ user.nickname }}</span>님, 안녕하세요 <small>(<a href="{% url 'logout' %}">로그아웃</a>)</small></p>
                     <br>
                     <a class="top-menu" href="{% url 'memberpost_list' %}">작성 글</a>
                     <a class="top-menu" href="{% url 'membercomment_list' %}">작성 댓글</a>
@@ -45,8 +47,11 @@
                         </li>
                     </ul>
                     <div class="search-bar">
-                        <input type="text" value="검색 기능 준비중">
-                        <button type="submit"></button>
+                        <form method="GET" accept-charset="utf-8" action="">
+                            {% csrf_token %}
+                            <input type="text" name="q" class="search-field" id="search-box">
+                            <button type="submit"></button>
+                        </form>
                     </div>
                 </nav>
             </header>

@@ -132,6 +132,14 @@ class AbstractComment(AbstractPost):
     def __str__(self):
         return self.content
 
+    @property
+    def published_date_for_board(self):
+        today = timezone.now().date()
+        if self.published_date.date() == today:
+            return self.published_date.strftime('%H:%M')
+        else:
+            return self.published_date.strftime('%y.%m.%d')
+
 class FreeComment(AbstractComment):
     post = models.ForeignKey('board.FreePost', on_delete=models.CASCADE, related_name='freecomments')
     likes = models.ManyToManyField(User, related_name='freecomment_likes', blank=True, null=True)

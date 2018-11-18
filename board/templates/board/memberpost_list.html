@@ -23,16 +23,16 @@
                         </a>
                     {% elif memberpost.board == "Report" %}
                         <a href="{% url 'reportpost_detail' pk=memberpost.pk %}">
-                            [{{  reportpost.show_area}}] [ {{ reportpost.specific_area }} ] {{ reportpost.title }}
-                            {% if reportpost.reportcomments.count %}
-                                [{{ reportpost.reportcomments.count }}]
+                            [{{  memberpost.show_area}}] [ {{ memberpost.specific_area }} ] {{ memberpost.title }}
+                            {% if memberpost.membercomments.count %}
+                                [{{ memberpost.membercomments.count }}]
                             {% endif %}
                         </a>
                     {% elif memberpost.board == "Proposal" %}
                         <a href="{% url 'proposalpost_detail' pk=memberpost.pk %}">
-                            [{{  proposalpost.show_proposal_type}}] {{ proposalpost.title }}
-                            {% if proposalpost.proposalcomments.count %}
-                                [{{ proposalpost.proposalcomments.count }}]
+                            [{{  memberpost.show_proposal_type}}] {{ memberpost.title }}
+                            {% if memberpost.membercomments.count %}
+                                [{{ memberpost.membercomments.count }}]
                             {% endif %}
                         </a>
                     {% else %}

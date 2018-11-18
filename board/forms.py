@@ -105,3 +105,6 @@ class UserChangeForm(forms.ModelForm):
             'nickname': '닉네임',
             'password': '비밀번호'
         }
+
+class SearchForm(forms.Form):
+    filter_content = forms.CharField(max_length=100)

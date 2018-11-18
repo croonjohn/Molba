@@ -59,6 +59,7 @@ urlpatterns = [
     path('member/comments/', views.membercomment_list, name='membercomment_list'),
     path('member/info/', views.member_info, name='member_info'),
     path('member/info/change', views.member_info_change, name='member_info_change'),
+    #path('search/', views.search_view, name='search'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

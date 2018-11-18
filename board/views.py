@@ -21,6 +21,8 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from hitcount.models import HitCount
 from hitcount.views import HitCountMixin
 from itertools import chain
+import operator
+from django.db.models import Q
 
 
 def freepost_list(request):
@@ -159,7 +161,7 @@ def proposalpost_new(request):
     if request.method == "POST":
         form = ProposalPostForm(request.POST, request.FILES)
         if form.is_valid():
-            post = form.save(commit=Falses)
+            post = form.save(commit=False)
             post.author = request.user
             post.save()
             return redirect('proposalpost_detail', pk=post.pk)
@@ -861,3 +863,118 @@ def noticecomment_remove(request, pk):
     else:
         return HttpResponse('작성자가 아닙니다.')
 
+#def search_view(request, filter_type, filter_content):
+#
+#    if filter_type == "all":
+#        searchpost_listed = sorted(
+#            chain(
+#                FreePost.objects.filter(title__icontains=filter_content),
+#                ReportPost.objects.filter(title__icontains=filter_content),
+#                ProposalPost.objects.filter(title__icontains=filter_content),
+#                NoticePost.objects.filter(title__icontains=filter_content),
+#                FreePost.objects.filter(content__icontains=filter_content),
+#                ReportPost.objects.filter(content__icontains=filter_content),
+#                ProposalPost.objects.filter(content__icontains=filter_content),
+#                NoticePost.objects.filter(content__icontains=filter_content),
+#                FreePost.objects.filter(author.nickname__icontains=filter_content),
+#                ReportPost.objects.filter(author.nickname__icontains=filter_content),
+#                ProposalPost.objects.filter(author.nickname__icontains=filter_content),
+#                NoticePost.objects.filter(author.nickname__icontains=filter_content)
+#            ),
+#            key=lambda post: post.published_date, reverse=True
+#        )
+#        paginator = Paginator(searchpost_listed, 10)
+#        page = request.GET.get('page')
+#        searchposts = paginator.get_page(page)
+#        return render(request, 'board/searchpost_list.html', {'searchposts': searchposts})
+#
+#    elif filter_type == "area":
+#        searchpost_listed = sorted(
+#            chain(
+#                ReportPost.objects.filter(area__icontains=filter_content),
+#            ),
+#            key=lambda post: post.published_date, reverse=True
+#        )
+#        paginator = Paginator(searchpost_listed, 10)
+#        page = request.GET.get('page')
+#        searchposts = paginator.get_page(page)
+#        return render(request, 'board/searchpost_list.html', {'searchposts': searchposts})
+#
+#    elif filter_type == "specific-area":
+#        searchpost_listed = sorted(
+#            chain(
+#                ReportPost.objects.filter(specific_area__icontains=filter_content),
+#            ),
+#            key=lambda post: post.published_date, reverse=True
+#        )
+#        paginator = Paginator(searchpost_listed, 10)
+#        page = request.GET.get('page')
+#        searchposts = paginator.get_page(page)
+#        return render(request, 'board/searchpost_list.html', {'searchposts': searchposts})
+#
+#    elif filter_type == "title":
+#        searchpost_listed = sorted(
+#            chain(
+#                FreePost.objects.filter(title__icontains=filter_content),
+#                ReportPost.objects.filter(title__icontains=filter_content),
+#                ProposalPost.objects.filter(title__icontains=filter_content),
+#                NoticePost.objects.filter(title__icontains=filter_content)
+#            ),
+#            key=lambda post: post.published_date, reverse=True
+#        )
+#        paginator = Paginator(searchpost_listed, 10)
+#        page = request.GET.get('page')
+#        searchposts = paginator.get_page(page)
+#        return render(request, 'board/searchpost_list.html', {'searchposts': searchposts})
+#        
+#    elif filter_type == "content":
+#        searchpost_listed = sorted(
+#            chain(
+#                FreePost.objects.filter(content__icontains=filter_content),
+#                ReportPost.objects.filter(content__icontains=filter_content),
+#                ProposalPost.objects.filter(content__icontains=filter_content),
+#                NoticePost.objects.filter(content__icontains=filter_content)
+#            ),
+#            key=lambda post: post.published_date, reverse=True
+#        )
+#        paginator = Paginator(searchpost_listed, 10)
+#        page = request.GET.get('page')
+#        searchposts = paginator.get_page(page)
+#        return render(request, 'board/searchpost_list.html', {'searchposts': searchposts})
+#
+#    elif filter_type == "title-content":
+#        searchpost_listed = sorted(
+#            chain(
+#                FreePost.objects.filter(title__icontains=filter_content),
+#                ReportPost.objects.filter(title__icontains=filter_content),
+#                ProposalPost.objects.filter(title__icontains=filter_content),
+#                NoticePost.objects.filter(title__icontains=filter_content),
+#                FreePost.objects.filter(content__icontains=filter_content),
+#                ReportPost.objects.filter(content__icontains=filter_content),
+#                ProposalPost.objects.filter(content__icontains=filter_content),
+#                NoticePost.objects.filter(content__icontains=filter_content)
+#            ),
+#            key=lambda post: post.published_date, reverse=True
+#        )
+#        paginator = Paginator(searchpost_listed, 10)
+#        page = request.GET.get('page')
+#        searchposts = paginator.get_page(page)
+#        return render(request, 'board/searchpost_list.html', {'searchposts': searchposts})
+#        
+#    elif filter_type == "nickname":
+#        searchpost_listed = sorted(
+#            chain(
+#                FreePost.objects.filter(author.nickname__icontains=filter_content),
+#                ReportPost.objects.filter(author.nickname__icontains=filter_content),
+#                ProposalPost.objects.filter(author.nickname__icontains=filter_content),
+#                NoticePost.objects.filter(author.nickname__icontains=filter_content)
+#            ),
+#            key=lambda post: post.published_date, reverse=True
+#        )
+#        paginator = Paginator(searchpost_listed, 10)
+#        page = request.GET.get('page')
+#        searchposts = paginator.get_page(page)
+#        return render(request, 'board/searchpost_list.html', {'searchposts': searchposts})
+#    
+#    else:
+#        return HttpResponse("검색 기능 오류. 관리자에게 문의 바랍니다.")

@@ -2,23 +2,52 @@
 
 {% block content %}
     <h2>작성 댓글 목록</h2>
-    {% for membercomment in membercomments %}
-    <div class="post">
-        <div class="date">
-            {{ membercomment.published_date }}
-        </div>
-        <div class="likes_and_hates">좋아요: {{ membercomment.total_likes }} 싫어요: {{ membercomment.total_hates }}</div>   
-        {% if membercomment.post.board == "Free" %}
-            <a href="{% url 'freepost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
-        {% elif membercomment.post.board == "Report" %}
-            <a href="{% url 'reportpost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
-        {% elif membercomment.post.board == "Proposal" %}
-            <a href="{% url 'proposalpost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
-        {% else %}
-            <a href="{% url 'noticepost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
-        {% endif %}
-    </div>
-    {% endfor %}
+    <table class="board-table">
+        <tr>
+            <th>댓글</th>
+            <th>삭제</th>
+            <th>날짜</th>
+            <th>추천/비추천</th>
+        </tr>
+        {% for membercomment in membercomments %}
+        <tr>
+            <div class="post">
+                <td>
+                    {% if membercomment.post.board == "Free" %}
+                        <a href="{% url 'freepost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
+                    {% elif membercomment.post.board == "Report" %}
+                        <a href="{% url 'reportpost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
+                    {% elif membercomment.post.board == "Proposal" %}
+                        <a href="{% url 'proposalpost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
+                    {% else %}
+                        <a href="{% url 'noticepost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="delete-comments">
+                        {% if membercomment.post.board == "Free" %}
+                            <a href="{% url 'freecomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
+                        {% elif membercomment.post.board == "Report" %}
+                            <a href="{% url 'reportcomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
+                        {% elif membercomment.post.board == "Proposal" %}
+                            <a href="{% url 'proposalcomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
+                        {% else %}
+                            <a href="{% url 'noticecomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div class="date">
+                        {{ membercomment.published_date_for_board }}
+                    </div>
+                </td>
+                <td>
+                    <div class="likes_and_hates">{{ membercomment.total_likes }} / -{{ membercomment.total_hates }}</div> 
+                </td>
+            </div>
+        </tr>
+        {% endfor %}
+    </table>
     <!-- pagination dispaly by Rob L from Stack Overflow -->
     <ul class="pagination">
             <li><a href="?page=1">&laquo; 첫 페이지</a></li>
