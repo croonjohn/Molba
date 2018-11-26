@@ -1,7 +1,22 @@
 {% extends 'board/base.html' %}
 
 {% block content %}
-    <h2>작성 댓글 목록</h2>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'member_info' member_pk=member.pk%}">회원정보</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'memberpost_list' member_pk=member.pk%}">작성 글</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'membercomment_list' member_pk=member.pk%}">작성 댓글</a>
+        </li>
+    </ul>
+    {% if member.pk == user.pk %}
+        <h2>작성 댓글 목록</h2>
+    {% else %}
+        <h2>{{ member.nickname }}님의 작성 댓글 목록</h2>
+    {% endif %}
     <table class="board-table">
         <tr>
             <th>댓글</th>
@@ -24,17 +39,19 @@
                     {% endif %}
                 </td>
                 <td>
-                    <div class="delete-comments">
-                        {% if membercomment.post.board == "Free" %}
-                            <a href="{% url 'freecomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
-                        {% elif membercomment.post.board == "Report" %}
-                            <a href="{% url 'reportcomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
-                        {% elif membercomment.post.board == "Proposal" %}
-                            <a href="{% url 'proposalcomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
-                        {% else %}
-                            <a href="{% url 'noticecomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
-                        {% endif %}
-                    </div>
+                    {% if member.pk == user.pk %}
+                        <div class="delete-comments">
+                            {% if membercomment.post.board == "Free" %}
+                                <a href="{% url 'freecomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
+                            {% elif membercomment.post.board == "Report" %}
+                                <a href="{% url 'reportcomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
+                            {% elif membercomment.post.board == "Proposal" %}
+                                <a href="{% url 'proposalcomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
+                            {% else %}
+                                <a href="{% url 'noticecomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </td>
                 <td>
                     <div class="date">

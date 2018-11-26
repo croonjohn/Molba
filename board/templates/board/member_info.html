@@ -1,10 +1,29 @@
 {% extends 'board/base.html' %}
 
 {% block content %}
-<h2>회원정보</h2>
-<p>아이디: {{ member.username }}</p>
-<p>닉네임: {{ member.nickname }}</p>
-<p>가입일: {{ member.signup_date }}</p>
-<p>마지막 로그인 일시: {{ member.last_login }}</p>
-<a href="{% url 'member_info_change' %}">회원정보 변경</a>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'member_info' member_pk=member.pk%}">회원정보</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'memberpost_list' member_pk=member.pk%}">작성 글</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'membercomment_list' member_pk=member.pk%}">작성 댓글</a>
+        </li>
+    </ul>
+    {% if member.pk == user.pk %}
+        <h2>회원정보</h2>
+    {% else %}
+        <h2>{{ member.nickname }}님의 회원정보</h2>
+    {% endif %}
+    {% if member.pk == user.pk %}
+        <p>아이디: {{ member.username }}</p>
+    {% endif %}
+    <p>닉네임: {{ member.nickname }}</p>
+    <p>가입일: {{ member.signup_date }}</p>
+    <p>마지막 로그인 일시: {{ member.last_login }}</p>
+    {% if member == user %}
+        <a href="{% url 'member_info_change' member_pk=user.pk %}">회원정보 변경</a>
+    {% endif %}
 {% endblock %}

@@ -1,10 +1,12 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.conf import settings
 
 class AbstractPost(models.Model):
     title = models.CharField(max_length=200)
-    author = models.ForeignKey('auth.User', on_delete=models.CASCADE, default=None, null=True, blank=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=None, null=True, blank=True)
+    author_nickname = models.CharField(max_length=100, default='None')
     published_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     content = models.TextField()
     last_edit_date = models.DateTimeField(auto_now=True)
@@ -53,6 +55,34 @@ class FreePost(AbstractPost):
     class Meta:
         abstract = False
 
+    @property
+    def show_title(self):
+        if len(self.title) > 45:
+            return self.title[0:45]+"..."
+        else:
+            return self.title
+    
+    @property
+    def show_title_best(self):
+        if len(self.title) > 40:
+            return self.title[0:40]+"..."
+        else:
+            return self.title
+
+    @property
+    def show_title_home(self):
+        if len(self.title) > 24:
+            return self.title[0:24]+"..."
+        else:
+            return self.title
+    
+    @property
+    def show_title_best_home(self):
+        if len(self.title) > 65:
+            return self.title[0:65]+"..."
+        else:
+            return self.title
+
 class ReportPost(AbstractPost):
     AREA_CHOICES = (
         ('SE','서울'), 
@@ -77,7 +107,7 @@ class ReportPost(AbstractPost):
         max_length=2,
         choices = AREA_CHOICES,
     )
-    specific_area = models.CharField(max_length=200)
+    specific_area = models.CharField(max_length=20)
     image = models.ImageField(upload_to='report/%Y/%m/%d/orig', blank=False, null=False)
     likes = models.ManyToManyField(User, related_name='reportpost_likes', blank=True, null=True)
     hates = models.ManyToManyField(User, related_name='reportpost_hates', blank=True, null=True)
@@ -89,6 +119,41 @@ class ReportPost(AbstractPost):
     @property
     def show_area(self):
         return self.get_area_display()
+
+    @property
+    def show_title(self):
+        specific_area_length = len(str(self.specific_area))
+        length_limit = 35-specific_area_length
+        if len(self.title) > length_limit:
+            return self.title[0:length_limit]+"..."
+        else:
+            return self.title
+    
+    @property
+    def show_title_best(self):
+        specific_area_length = len(str(self.specific_area))
+        length_limit = 30-specific_area_length
+        if len(self.title) > length_limit:
+            return self.title[0:length_limit]+"..."
+        else:
+            return self.title
+    
+    @property
+    def show_title_home(self):
+        specific_area_length = len(str(self.specific_area))
+        length_limit = 20-specific_area_length
+        if len(self.title) > length_limit:
+            return self.title[0:length_limit]+"..."
+        else:
+            return self.title
+    @property
+    def show_title_best_home(self):
+        specific_area_length = len(str(self.specific_area))
+        length_limit = 50-specific_area_length
+        if len(self.title) > length_limit:
+            return self.title[0:length_limit]+"..."
+        else:
+            return self.title
 
 class ProposalPost(AbstractPost):
     PR_CHOICES = (
@@ -107,6 +172,33 @@ class ProposalPost(AbstractPost):
     @property
     def show_proposal_type(self):
         return self.get_proposal_type_display()
+    
+    @property
+    def show_title(self):
+        if len(self.title) > 45:
+            return self.title[0:45]+"..."
+        else:
+            return self.title
+    
+    @property
+    def show_title_best(self):
+        if len(self.title) > 35:
+            return self.title[0:35]+"..."
+        else:
+            return self.title
+    
+    @property
+    def show_title_home(self):
+        if len(self.title) > 24:
+            return self.title[0:24]+"..."
+        else:
+            return self.title
+    @property
+    def show_title_best_home(self):
+        if len(self.title) > 62:
+            return self.title[0:62]+"..."
+        else:
+            return self.title
 
 class NoticePost(AbstractPost):
     NOTICE_CHOICES = (
@@ -121,6 +213,33 @@ class NoticePost(AbstractPost):
 
     class Meta:
         abstract = False
+
+    @property
+    def show_title(self):
+        if len(self.title) > 42:
+            return self.title[0:42]+"..."
+        else:
+            return self.title
+    
+    @property
+    def show_title_best(self):
+        if len(self.title) > 35:
+            return self.title[0:35]+"..."
+        else:
+            return self.title
+
+    @property
+    def show_title_home(self):
+        if len(self.title) > 24:
+            return self.title[0:24]+"..."
+        else:
+            return self.title
+    @property
+    def show_title_best_home(self):
+        if len(self.title) > 62:
+            return self.title[0:62]+"..."
+        else:
+            return self.title
 
 class AbstractComment(AbstractPost):
     title = models.CharField(max_length=200, blank=True, null=True)

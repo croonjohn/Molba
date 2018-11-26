@@ -14,63 +14,50 @@
             <th>조회</th>
             <th>추천</th>
         </tr>
-        {% for notice_top in notice_tops %}
-            <tr>
-                <div class="notice">
-                    <td class="title"><a href="{% url 'noticepost_detail' pk=notice_top.pk %}">[공지] {{ notice_top.title }}</a></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </div>
-            </tr>
-        {% endfor %}
         {% for noticepost in noticeposts %}
-        <tr>
-            <div class="post">
-                <td class="title">
-                    <a href="{% url 'noticepost_detail' pk=noticepost.pk %}">
-                        {{ noticepost.title }}
-                        {% if noticepost.noticecomments.count %}
-                            [{{ noticepost.noticecomments.count }}]
+        <tr class="post">
+            <td class="title">
+                <a href="{% url 'noticepost_detail' pk=noticepost.pk %}">
+                    <span class="is-fixed">
+                        {% if noticepost.notice_type == 1 %}
+                            [필독]
                         {% endif %}
-                    </a>
-                </td>
-                <td>
-                    <p>{{ noticepost.author.nickname }}</p>
-                </td>
-                <td>
-                    <div class="date">
-                    {{ noticepost.published_date_for_board }}
-                    </div>
-                </td>
-                <td>
-                    <div class="hitcount">
-                    {% get_hit_count for noticepost %}
-                    </div>
-                </td>
-                <td>
-                    <div class="likes_and_hates">{{ noticepost.likes_minus_hates }}</div>
-                </td>
-                
-                
-            </div>
+                    </span>
+                    {{ noticepost.show_title }}
+                    {% if noticepost.noticecomments.count %}
+                        <span class="comment-count">[{{ noticepost.noticecomments.count }}]</span>
+                    {% endif %}
+                </a>
+            </td>
+            <td class="nickname">
+                {{ noticepost.author.nickname }}
+            </td>
+            <td class="date">
+                {{ noticepost.published_date_for_board }}
+            </td>
+            <td class="hitcount">
+                {% get_hit_count for noticepost %}
+            </td>
+            <td class="likes_and_hates">
+                {{ noticepost.likes_minus_hates }}
+            </td>
         </tr>
     {% endfor %}
     </table>
 
     <div class="bottom-bar">
         <div class="search-bar">
-                <input type="text" value="검색 기능 준비중">
+            <form method="GET" accept-charset="utf-8" action="{% url 'noticepost_list' %}">
+                {% csrf_token %}
+                <input type="text" name="q" value="{{ q }}">
                 <button type="submit"></button>
                 <select name="search-option">
-                    <option value="all" selected="selected">전체</option>
                     <option value="title">제목</option>
                     <option value="content">내용</option>
                     <option value="title-content">제목+내용</option>
                     <option value="nickname">닉네임</option>
-                    <option value="date">날짜</option>
                 </select>
+            </form>
         </div>
         {% if user.is_authenticated %}
             <div class="new-post">
@@ -81,30 +68,30 @@
 
     <!-- pagination dispaly by Rob L from Stack Overflow -->
     <ul class="pagination">
-        <li><a href="?page=1">&laquo; 첫 페이지</a></li>
+        <li><a href="?page=1&q={{ q }}&search-option={{ filter_type }}">&laquo; 첫 페이지</a></li>
         {% if noticeposts.has_previous %}
-            <li><a href="?page={{ noticeposts.previous_page_number }}">이전</a></li>
+            <li><a href="?page={{ noticeposts.previous_page_number }}&q={{ q }}&search-option={{ filter_type }}">이전</a></li>
         {% endif %}
         
         {% if noticeposts.number|add:'-4' > 1 %}
-        <li><a href="?page={{ noticeposts.number|add:'-5' }}">&hellip;</a></li>
+        <li><a href="?page={{ noticeposts.number|add:'-5' }}&q={{ q }}&search-option={{ filter_type }}">&hellip;</a></li>
         {% endif %}
         
         {% for i in noticeposts.paginator.page_range %}
             {% if noticeposts.number == i %}
                 <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
             {% elif i > noticeposts.number|add:'-5' and i < noticeposts.number|add:'5' %}
-                <li><a href="?page={{ i }}">{{ i }}</a></li>
+                <li><a href="?page={{ i }}&q={{ q }}&search-option={{ filter_type }}">{{ i }}</a></li>
             {% endif %}
         {% endfor %}
         
         {% if noticeposts.paginator.num_pages > noticeposts.number|add:'4' %}
-            <li><a href="?page={{ noticeposts.number|add:'5' }}">&hellip;</a></li>
+            <li><a href="?page={{ noticeposts.number|add:'5' }}&q={{ q }}&search-option={{ filter_type }}">&hellip;</a></li>
         {% endif %}
 
         {% if noticeposts.has_next %}
-            <li><a href="?page={{ noticeposts.next_page_number }}">다음</a></li>
+            <li><a href="?page={{ noticeposts.next_page_number }}&q={{ q }}&search-option={{ filter_type }}">다음</a></li>
         {% endif %}
-        <li><a href="?page={{ noticeposts.paginator.num_pages }}">끝 페이지 &raquo;</a></li>
+        <li><a href="?page={{ noticeposts.paginator.num_pages }}&q={{ q }}&search-option={{ filter_type }}">끝 페이지 &raquo;</a></li>
     </ul>
 {% endblock %}

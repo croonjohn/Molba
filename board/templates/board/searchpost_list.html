@@ -2,91 +2,110 @@
 {% load hitcount_tags %}
 
 {% block content %}
-    <h2>작성 글 목록</h2>
-    <table class="board-table">
+    <h2>검색 결과</h2>
+    <p> "{{ q }}"의 검색 결과입니다.</p>
+    <table class="board-table-best">
         <tr>
+            <th>게시판</th>
             <th>제목</th>
+            <th>글쓴이</th>
             <th>날짜</th>
             <th>조회</th>
             <th>추천</th>
         </tr>
         {% for searchpost in searchposts %}
-        <tr>
-            <div class="post">
-                <td>
-                    {% if searchpost.board == "Free" %}
-                        <a href="{% url 'freepost_detail' pk=searchpost.pk %}">
-                            {{ searchpost.title }} 
-                            {% if searchpost.freecomments.count %}
-                                [{{ searchpost.freecomments.count }}]
-                            {% endif %}
-                        </a>
-                    {% elif searchpost.board == "Report" %}
-                        <a href="{% url 'reportpost_detail' pk=searchpost.pk %}">
-                            [{{  searchpost.show_area}}] [ {{ searchpost.specific_area }} ] {{ searchpost.title }}
-                            {% if searchpost.searchcomments.count %}
-                                [{{ searchpost.searchcomments.count }}]
-                            {% endif %}
-                        </a>
-                    {% elif searchpost.board == "Proposal" %}
-                        <a href="{% url 'proposalpost_detail' pk=searchpost.pk %}">
-                            [{{  searchpost.show_proposal_type}}] {{ searchpost.title }}
-                            {% if searchpost.searchcomments.count %}
-                                [{{ searchpost.searchcomments.count }}]
-                            {% endif %}
-                        </a>
-                    {% else %}
-                        <a href="{% url 'noticepost_detail' pk=searchpost.pk %}">
-                            {{ searchpost.title }}
-                            {% if searchpost.noticecomments.count %}
-                                [{{ searchpost.noticecomments.count }}]
-                            {% endif %}
-                        </a>
-                    {% endif %}
-                </td>
-                <td>
-                    <div class="date">
-                            {{ searchpost.published_date_for_board }}
-                    </div>
-                </td>
-                <td>
-                    <div class="hitcount">
-                        {% get_hit_count for searchpost %}
-                    </div>
-                </td>
-                <td>
-                    <div class="likes_and_hates">{{ searchpost.likes_minus_hates }}</div>   
-                </td>
-            </div>
+        <tr class="post">
+            <td class="board-name">
+                {% if searchpost.board == "Free" %}
+                    <a href="{% url 'freepost_list' %}">
+                        [자유]
+                    </a>
+                {% elif searchpost.board == "Report" %}
+                    <a href="{% url 'reportpost_list' %}">
+                        [제보]
+                    </a>
+                {% elif searchpost.board == "Proposal" %}
+                    <a href="{% url 'proposalpost_list' %}">
+                        [건의/신고]
+                    </a>
+                {% else %}
+                    <a href="{% url 'noticepost_list' %}">
+                        [공지]
+                    </a>
+                {% endif %}
+            </td>
+            <td class="title">
+                {% if searchpost.board == "Free" %}
+                    <a href="{% url 'freepost_detail' pk=searchpost.pk %}">
+                        {{ searchpost.show_title_best }} 
+                        {% if searchpost.freecomments.count %}
+                            <span class="comment-count">[{{ searchpost.freecomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                {% elif searchpost.board == "Report" %}
+                    <a href="{% url 'reportpost_detail' pk=searchpost.pk %}">
+                        [{{  searchpost.show_area}}] [ {{ searchpost.specific_area }} ] {{ searchpost.show_title_best }}
+                        {% if searchpost.searchcomments.count %}
+                            <span class="comment-count">[{{ searchpost.searchcomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                {% elif searchpost.board == "Proposal" %}
+                    <a href="{% url 'proposalpost_detail' pk=searchpost.pk %}">
+                        [{{  searchpost.show_proposal_type}}] {{ searchpost.show_title_best }}
+                        {% if searchpost.searchcomments.count %}
+                            <span class="comment-count">[{{ searchpost.searchcomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                {% else %}
+                    <a href="{% url 'noticepost_detail' pk=searchpost.pk %}">
+                        {{ searchpost.show_title_best }}
+                        {% if searchpost.noticecomments.count %}
+                            <span class="comment-count">[{{ searchpost.noticecomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                {% endif %}
+            </td>
+            <td class="nickname">
+                {{ searchpost.author.nickname }}
+            </td>
+            <td class="date">
+                {{ searchpost.published_date_for_board }}
+            </td>
+            <td class="hitcount">
+                {% get_hit_count for searchpost %}
+            </td>
+            <td class="likes_and_hates">
+                {{ searchpost.likes_minus_hates }}
+            </td>
         </tr>
         {% endfor %}
     </table>
     <!-- pagination dispaly by Rob L from Stack Overflow -->
     <ul class="pagination">
-            <li><a href="?page=1">&laquo; 첫 페이지</a></li>
+            <li><a href="?page=1&q={{ q }}">&laquo; 첫 페이지</a></li>
             {% if searchposts.has_previous %}
-                <li><a href="?page={{ searchposts.previous_page_number }}">이전</a></li>
+                <li><a href="?page={{ searchposts.previous_page_number }}&q={{ q }}">이전</a></li>
             {% endif %}
             
             {% if searchposts.number|add:'-4' > 1 %}
-            <li><a href="?page={{ searchposts.number|add:'-5' }}">&hellip;</a></li>
+            <li><a href="?page={{ searchposts.number|add:'-5' }}&q={{ q }}">&hellip;</a></li>
             {% endif %}
             
             {% for i in searchposts.paginator.page_range %}
                 {% if searchposts.number == i %}
                     <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
                 {% elif i > searchposts.number|add:'-5' and i < searchposts.number|add:'5' %}
-                    <li><a href="?page={{ i }}">{{ i }}</a></li>
+                    <li><a href="?page={{ i }}&q={{ q }}">{{ i }}</a></li>
                 {% endif %}
             {% endfor %}
             
             {% if searchposts.paginator.num_pages > searchposts.number|add:'4' %}
-                <li><a href="?page={{ searchposts.number|add:'5' }}">&hellip;</a></li>
+                <li><a href="?page={{ searchposts.number|add:'5' }}&q={{ q }}">&hellip;</a></li>
             {% endif %}
     
             {% if searchposts.has_next %}
-                <li><a href="?page={{ searchposts.next_page_number }}">다음</a></li>
+                <li><a href="?page={{ searchposts.next_page_number }}&q={{ q }}">다음</a></li>
             {% endif %}
-            <li><a href="?page={{ searchposts.paginator.num_pages }}">끝 페이지 &raquo;</a></li>
+            <li><a href="?page={{ searchposts.paginator.num_pages }}&q={{ q }}">끝 페이지 &raquo;</a></li>
         </ul>
 {% endblock %}

@@ -1,0 +1,125 @@
+{% extends 'board/base.html' %}
+{% load hitcount_tags %}
+
+{% block content %}
+    <div class="board-explanation">
+        <h3>베스트게시판</h3>
+        <p>뭘봐의 베스트게시판입니다. 게시글의 모든 저작권은 작성자에게 있습니다.</p>
+        <p>모든 게시판에서 순 추천수가 15개 이상일 경우 베스트게시판에 자동으로 업로드됩니다.</p>
+    </div>
+    <table class="board-table-best">
+        <tr>
+            <th>게시판</th>
+            <th>제목</th>
+            <th>글쓴이</th>
+            <th>날짜</th>
+            <th>조회</th>
+            <th>추천</th>
+        </tr>
+        {% for notice_top in notice_tops %}
+            <tr class="notice">
+                <td class="board-name">[공지]</td>
+                <td class="title"><a href="{% url 'noticepost_detail' pk=notice_top.pk %}">{{ notice_top.show_title }}</a></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        {% endfor %}
+        {% for bestpost in bestposts %}
+        <tr class="post">
+            <td class="board-name">
+                {% if bestpost.board == "Free" %}
+                    <a href="{% url 'freepost_list' %}">
+                        [자유]
+                    </a>
+                {% elif bestpost.board == "Report" %}
+                    <a href="{% url 'reportpost_list' %}">
+                        [제보]
+                    </a>
+                {% elif bestpost.board == "Proposal" %}
+                    <a href="{% url 'proposalpost_list' %}">
+                        [건의/신고]
+                    </a>
+                {% else %}
+                    <a href="{% url 'noticepost_list' %}">
+                        [공지]
+                    </a>
+                {% endif %}
+            </td>
+            <td class="title">
+                {% if bestpost.board == "Free" %}
+                    <a href="{% url 'freepost_detail' pk=bestpost.pk %}">
+                        {{ bestpost.show_title_best }} 
+                        {% if bestpost.freecomments.count %}
+                            <span class="comment-count">[{{ bestpost.freecomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                {% elif bestpost.board == "Report" %}
+                    <a href="{% url 'reportpost_detail' pk=bestpost.pk %}">
+                        [{{  bestpost.show_area}}] [ {{ bestpost.specific_area }} ] {{ bestpost.show_title_best }}
+                        {% if bestpost.reportcomments.count %}
+                            <span class="comment-count">[{{ bestpost.reportcomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                {% elif bestpost.board == "Proposal" %}
+                    <a href="{% url 'proposalpost_detail' pk=bestpost.pk %}">
+                        [{{  bestpost.show_proposal_type}}] {{ bestpost.show_title_best }}
+                        {% if bestpost.proposalcomments.count %}
+                            <span class="comment-count">[{{ bestpost.proposalcomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                {% else %}
+                    <a href="{% url 'noticepost_detail' pk=bestpost.pk %}">
+                        {{ bestpost.show_title_best }}
+                        {% if bestpost.noticecomments.count %}
+                            <span class="comment-count">[{{ bestpost.noticecomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                {% endif %}
+            </td>
+            <td class="nickname">
+                <a href="{% url 'member_info' member_pk=bestpost.author.pk %}">{{ bestpost.author.nickname }}</a>
+            </td>
+            <td class="date">
+                {{ bestpost.published_date_for_board }}
+            </td>
+            <td class="hitcount">
+                {% get_hit_count for bestpost %}
+            </td>
+            <td class="likes_and_hates">
+                {{ bestpost.likes_minus_hates }}
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+
+    <!-- pagination dispaly by Rob L from Stack Overflow -->
+    <ul class="pagination">
+        <li><a href="?page=1">&laquo; 첫 페이지</a></li>
+        {% if bestposts.has_previous %}
+            <li><a href="?page={{ bestposts.previous_page_number }}">이전</a></li>
+        {% endif %}
+        
+        {% if bestposts.number|add:'-4' > 1 %}
+        <li><a href="?page={{ bestposts.number|add:'-5' }}">&hellip;</a></li>
+        {% endif %}
+        
+        {% for i in bestposts.paginator.page_range %}
+            {% if bestposts.number == i %}
+                <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+            {% elif i > bestposts.number|add:'-5' and i < bestposts.number|add:'5' %}
+                <li><a href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if bestposts.paginator.num_pages > bestposts.number|add:'4' %}
+            <li><a href="?page={{ bestposts.number|add:'5' }}">&hellip;</a></li>
+        {% endif %}
+
+        {% if bestposts.has_next %}
+            <li><a href="?page={{ bestposts.next_page_number }}">다음</a></li>
+        {% endif %}
+        <li><a href="?page={{ bestposts.paginator.num_pages }}">끝 페이지 &raquo;</a></li>
+    </ul>
+{% endblock %}

@@ -2,7 +2,22 @@
 {% load hitcount_tags %}
 
 {% block content %}
-    <h2>작성 글 목록</h2>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'member_info' member_pk=member.pk%}">회원정보</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'memberpost_list' member_pk=member.pk%}">작성 글</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'membercomment_list' member_pk=member.pk%}">작성 댓글</a>
+        </li>
+    </ul>
+    {% if member.pk == user.pk %}
+        <h2>작성 글 목록</h2>
+    {% else %}
+        <h2>{{ member.nickname }}님의 작성 글 목록</h2>
+    {% endif %}
     <table class="board-table">
         <tr>
             <th>제목</th>
@@ -11,53 +26,47 @@
             <th>추천</th>
         </tr>
         {% for memberpost in memberposts %}
-        <tr>
-            <div class="post">
-                <td>
-                    {% if memberpost.board == "Free" %}
-                        <a href="{% url 'freepost_detail' pk=memberpost.pk %}">
-                            {{ memberpost.title }} 
-                            {% if memberpost.freecomments.count %}
-                                [{{ memberpost.freecomments.count }}]
-                            {% endif %}
-                        </a>
-                    {% elif memberpost.board == "Report" %}
-                        <a href="{% url 'reportpost_detail' pk=memberpost.pk %}">
-                            [{{  memberpost.show_area}}] [ {{ memberpost.specific_area }} ] {{ memberpost.title }}
-                            {% if memberpost.membercomments.count %}
-                                [{{ memberpost.membercomments.count }}]
-                            {% endif %}
-                        </a>
-                    {% elif memberpost.board == "Proposal" %}
-                        <a href="{% url 'proposalpost_detail' pk=memberpost.pk %}">
-                            [{{  memberpost.show_proposal_type}}] {{ memberpost.title }}
-                            {% if memberpost.membercomments.count %}
-                                [{{ memberpost.membercomments.count }}]
-                            {% endif %}
-                        </a>
-                    {% else %}
-                        <a href="{% url 'noticepost_detail' pk=memberpost.pk %}">
-                            {{ memberpost.title }}
-                            {% if memberpost.noticecomments.count %}
-                                [{{ memberpost.noticecomments.count }}]
-                            {% endif %}
-                        </a>
-                    {% endif %}
-                </td>
-                <td>
-                    <div class="date">
-                            {{ memberpost.published_date_for_board }}
-                    </div>
-                </td>
-                <td>
-                    <div class="hitcount">
-                        {% get_hit_count for memberpost %}
-                    </div>
-                </td>
-                <td>
-                    <div class="likes_and_hates">{{ memberpost.likes_minus_hates }}</div>   
-                </td>
-            </div>
+        <tr class="post">
+            <td class="title">
+                {% if memberpost.board == "Free" %}
+                    <a href="{% url 'freepost_detail' pk=memberpost.pk %}">
+                        {{ memberpost.show_title }} 
+                        {% if memberpost.freecomments.count %}
+                            <span class="comment-count">[{{ memberpost.freecomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                {% elif memberpost.board == "Report" %}
+                    <a href="{% url 'reportpost_detail' pk=memberpost.pk %}">
+                        [{{  memberpost.show_area}}] [ {{ memberpost.specific_area }} ] {{ memberpost.title }}
+                        {% if memberpost.reportcomments.count %}
+                            <span class="comment-count">[{{ memberpost.reportcomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                {% elif memberpost.board == "Proposal" %}
+                    <a href="{% url 'proposalpost_detail' pk=memberpost.pk %}">
+                        [{{  memberpost.show_proposal_type}}] {{ memberpost.title }}
+                        {% if memberpost.proposalcomments.count %}
+                            <span class="comment-count">[{{ memberpost.proposalcomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                {% else %}
+                    <a href="{% url 'noticepost_detail' pk=memberpost.pk %}">
+                        {{ memberpost.title }}
+                        {% if memberpost.noticecomments.count %}
+                            <span class="comment-count">[{{ memberpost.noticecomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                {% endif %}
+            </td>
+            <td class="date">
+                {{ memberpost.published_date_for_board }}
+            </td>
+            <td class="hitcount">
+                {% get_hit_count for memberpost %}
+            </td>
+            <td class="likes_and_hates">
+               {{ memberpost.likes_minus_hates }}
+            </td>
         </tr>
         {% endfor %}
     </table>

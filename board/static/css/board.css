@@ -21,31 +21,6 @@
         margin: 0 10px;
     }
 
-    nav {
-        width: 100%;
-        height: 40px;
-        position: relative;
-        background-color: #0055FF;
-        border-radius: 5px;
-    }
-
-    nav ul {
-        width: 80%;
-        margin-top: 8px;
-        display: inline-block;
-    }
-    
-    nav ul li {
-        left: 0;
-        width: 130px;
-        text-align: center;
-        display: inline-block;
-        font-size: 16px;
-        font-weight: 600 !important;
-        margin-left: -24px;
-        margin-right: 36px;
-    }
-
     nav .search-bar {
         width: 15%;
         height: 26px;
@@ -71,18 +46,109 @@
         cursor: pointer;
     }
 
-    .board-table {
+    table {
+        text-indent: 1%;
+    }
+    .home-best {
+        width: 100%;
+        margin: 20px 0;
+        height: 216px;
+    }
+
+    .home-board-left {
+        width: 48%;
+        display: inline-block;
+        margin: 20px 1.7% 20px 0px;
+        height: 216px;
+    }
+    
+    .home-board-right {
+        width: 48%;
+        display: inline-block;
+        margin: 20px 0px 20px 1.7%;
+        height: 216px;
+    }
+    
+    .board-table, .board-table-best {
+        margin: 24px auto;
+        width: 100%;
         font-size: 14px;
+        line-height: 36px;
+    }
+
+    .home-best tr, .home-board-left tr, .home-board-right tr{
+        font-size: 14px;
+        line-height: 36px;
+        height: 36px;
+    }
+
+    .board-table tr .title {
+        width: 70%;
+    }
+
+    .board-table-best tr .board-name {
+        width: 9%;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .board-table-best tr .title {
+        width: 61%;
+    }
+
+    .board-table tr .nickname, .board-table-best tr .nickname {
+        width: 10%;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .board-table tr .date, .board-table-best tr .date {
+        width: 8%;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .board-table tr .hitcount, .board-table-best tr .hitcount {
+        width: 7%;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .board-table tr .likes_and_hates, .board-table-best tr .likes_and_hates {
+        width: 5%;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .board-table a, .board-table a:hover, .board-table-best a, .board-table-best a:hover,
+    .home-best a, .home-board-left a, .home-board-right a {
+        color: #333333;
+    }
+
+    .board-table a:visited, .board-table-best a:visited,
+    .home-best a:visited, .home-board-left a:visited, .home-board-right a:visited {
+        color: #777777;
+    }
+    
+    .comment-count {
+        color: red;
+        font-weight: 700;
+    }
+
+    .notice a {
+        font-weight: 700;
+    }
+
+    .notice, .home-best th, .home-board-left th, .home-board-right th {
+        background: #f0f0f0;
+    }
+
+    .board-table th, .board-table-best th {
+        text-align: center;
     }
 
     .site-title {
         font-size: 36px;
-    }
-
-    table {
-        margin-top: 30px;
-        margin-bottom: 30px;
-        padding-top: 2px;
     }
 }
 
@@ -91,7 +157,6 @@
         width: 100%;
         font-family: 'Nanum Gothic', sans-serif !important;
         font-weight: 500 !important;
-        font-size: 6px;
     }
 
     #wrapper {
@@ -99,6 +164,10 @@
         margin: 0 auto;
         position: relative;
         min-height: 100%;
+    }
+
+    #wrapper p {
+        font-size: 12px;
     }
 
     header {

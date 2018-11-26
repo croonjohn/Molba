@@ -1,5 +1,122 @@
 {% extends 'board/base.html' %}
 
 {% block content %}
-    <h1>홈페이지데스</h1>
+    <table class="home-best">
+        <tr>
+            <th><a href="{% url 'bestpost_list' %}">베스트 게시물</a></th>
+        </tr>
+        {% for bestpost in bestposts %}
+            <tr class="post">
+                <td class="title">
+                    {% if bestpost.board == "Free" %}
+                        <a href="{% url 'freepost_detail' pk=bestpost.pk %}">
+                            {{ bestpost.show_title_best_home }} 
+                            {% if bestpost.freecomments.count %}
+                                <span class="comment-count">[{{ bestpost.freecomments.count }}]</span>
+                            {% endif %}
+                        </a>
+                    {% elif bestpost.board == "Report" %}
+                        <a href="{% url 'reportpost_detail' pk=bestpost.pk %}">
+                            [{{  bestpost.show_area}}] [ {{ bestpost.specific_area }} ] {{ bestpost.show_title_best_home }}
+                            {% if bestpost.reportcomments.count %}
+                                <span class="comment-count">[{{ bestpost.reportcomments.count }}]</span>
+                            {% endif %}
+                        </a>
+                    {% elif bestpost.board == "Proposal" %}
+                        <a href="{% url 'proposalpost_detail' pk=bestpost.pk %}">
+                            [{{  bestpost.show_proposal_type}}] {{ bestpost.show_title_best_home }}
+                            {% if bestpost.proposalcomments.count %}
+                                <span class="comment-count">[{{ bestpost.proposalcomments.count }}]</span>
+                            {% endif %}
+                        </a>
+                    {% else %}
+                        <a href="{% url 'noticepost_detail' pk=bestpost.pk %}">
+                            <span class="is-fixed">
+                                {% if bestpost.notice_type == 1 %}
+                                    [필독]
+                                {% endif %}
+                            </span>
+                            {{ bestpost.show_title_best_home }}
+                            {% if bestpost.noticecomments.count %}
+                                <span class="comment-count">[{{ bestpost.noticecomments.count }}]</span>
+                            {% endif %}
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <table class="home-board-left">
+        <tr>
+            <th><a href="{% url 'reportpost_list' %}">제보게시판</a></th>
+        </tr>
+        {% for reportpost in reportposts %}
+            <tr class="post">
+                <td class="title">
+                    <a href="{% url 'reportpost_detail' pk=reportpost.pk %}">
+                        [{{ reportpost.show_area }}][{{ reportpost.specific_area }}]{{ reportpost.show_title_home }}
+                        {% if reportpost.reportcomments.count %}
+                            <span class="comment-count">[{{ reportpost.reportcomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <table class="home-board-right">
+        <tr>
+            <th><a href="{% url 'freepost_list' %}">자유게시판</a></th>
+        </tr>
+        {% for freepost in freeposts %}
+            <tr class="post">
+                <td class="title">
+                    <a href="{% url 'freepost_detail' pk=freepost.pk %}">
+                        {{ freepost.show_title_home }}
+                        {% if freepost.freecomments.count %}
+                            <span class="comment-count">[{{ freepost.freecomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <table class="home-board-left">
+        <tr>
+            <th><a href="{% url 'proposalpost_list' %}">건의/신고게시판</a></th>
+        </tr>
+        {% for proposalpost in proposalposts %}
+            <tr class="post">
+                <td class="title">
+                    <a href="{% url 'proposalpost_detail' pk=proposalpost.pk %}">
+                        [{{ proposalpost.show_proposal_type }}]{{ proposalpost.show_title_home }}
+                        {% if proposalpost.proposalcomments.count %}
+                            <span class="comment-count">[{{ proposalpost.proposalcomments.count }}]</span>
+                        {% endif %}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <table class="home-board-right">
+        <tr>
+            <th><a href="{% url 'noticepost_list' %}">공지게시판</a></th>
+        </tr>
+        {% for noticepost in noticeposts %}
+            <tr class="post">
+                <td class="title">
+                <a href="{% url 'noticepost_detail' pk=noticepost.pk %}">
+                    <span class="is-fixed">
+                        {% if noticepost.notice_type == 1 %}
+                            [필독]
+                        {% endif %}
+                    </span>
+                    {{ noticepost.show_title_home }}
+                    {% if noticepost.noticecomments.count %}
+                        <span class="comment-count">[{{ noticepost.noticecomments.count }}]</span>
+                    {% endif %}
+                </a>
+            </td>
+            </tr>
+        {% endfor %}
+    </table>
 {% endblock %}

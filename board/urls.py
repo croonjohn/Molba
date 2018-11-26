@@ -10,6 +10,7 @@ urlpatterns = [
     path('report/', views.reportpost_list, name='reportpost_list'),
     path('proposal/', views.proposalpost_list, name='proposalpost_list'),
     path('notice/', views.noticepost_list, name='noticepost_list'),
+    path('best/', views.bestpost_list, name='bestpost_list'),
     path('free/<int:pk>', views.freepost_detail, name='freepost_detail'),
     path('report/<int:pk>', views.reportpost_detail, name='reportpost_detail'),
     path('proposal/<int:pk>', views.proposalpost_detail, name='proposalpost_detail'),
@@ -55,11 +56,11 @@ urlpatterns = [
     path('report/comment/<int:pk>/remove/', views.reportcomment_remove, name='reportcomment_remove'),
     path('proposal/comment/<int:pk>/remove/', views.proposalcomment_remove, name='proposalcomment_remove'),
     path('notice/comment/<int:pk>/remove/', views.noticecomment_remove, name='noticecomment_remove'),
-    path('member/posts/', views.memberpost_list, name='memberpost_list'),
-    path('member/comments/', views.membercomment_list, name='membercomment_list'),
-    path('member/info/', views.member_info, name='member_info'),
-    path('member/info/change', views.member_info_change, name='member_info_change'),
-    #path('search/', views.search_view, name='search'),
+    path('member/<member_pk>/posts/', views.memberpost_list, name='memberpost_list'),
+    path('member/<member_pk>/comments/', views.membercomment_list, name='membercomment_list'),
+    path('member/<member_pk>/info/', views.member_info, name='member_info'),
+    path('member/<member_pk>/info/change', views.member_info_change, name='member_info_change'),
+    path('search/', views.top_search_view, name='top_search_view'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
