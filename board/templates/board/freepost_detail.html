@@ -45,7 +45,7 @@
             <div class="date">{{ freecomment.published_date }}</div>
             <div class="number_of_edits">수정횟수: {{ freecomment.number_of_edits }}</div>
             <div class="last_edit_date">마지막 수정일시: {{ freecomment.last_edit_date }}</div>
-            <span class="control hidden" id = "control_id{{ forloop.counter0 }}">
+            <span class="control hidden" id = "control_id{{ forloop.counter }}">
                 <a class="btn btn-default" href="{% url 'freecomment_edit' pk=freecomment.pk %}" onclick="return confirm('글을 수정하시겠습니까?')">수정</a>
                 <a class="btn btn-default" href="{% url 'freecomment_remove' pk=freecomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
             </span>

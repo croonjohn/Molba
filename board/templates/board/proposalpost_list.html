@@ -2,103 +2,114 @@
 {% load hitcount_tags %}
 
 {% block content %}
-    <div class="board-explanation">
-        <h3>건의/신고게시판</h3>
-        <p>뭘봐의 건의/신고 게시판입니다. 게시글의 모든 저작권은 작성자에게 있습니다.</p>
-        <p>*건의 : 뭘봐 운영 및 발전 방향에 대한 건의를 해주시면 적극 반영하겠습니다.</p>
-        <p>*신고 : 불량 유저 및 게시물에 대해 신고해주시면 검토 후 제재조치를 취하도록 하겠습니다.</p>
+    <div class="board-explanation row">
+        <div class="col">
+            <div class="md-font text-700">건의/신고게시판</div>
+            <div class="xs-font my-3">
+                뭘봐의 건의/신고 게시판입니다. 게시글의 모든 저작권은 작성자에게 있습니다.<br>
+                *건의 : 뭘봐 운영 및 발전 방향에 대한 건의를 해주시면 적극 반영하겠습니다.<br>
+                *신고 : 불량 유저 및 게시물에 대해 신고해주시면 검토 후 제재조치를 취하도록 하겠습니다.
+            </div>
+        </div>
     </div>
-    <table class="board-table">
-            <tr>
-                <th>제목</th>
-                <th>글쓴이</th>
-                <th>날짜</th>
-                <th>조회</th>
-                <th>추천</th>
-            </tr>
-            {% for notice_top in notice_tops %}
-                <tr class="notice">
-                    <td class="title"><a href="{% url 'noticepost_detail' pk=notice_top.pk %}">[공지] {{ notice_top.show_title }}</a></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            {% endfor %}
-            {% for proposalpost in proposalposts %}
-            <tr class="post">
-                <td class="title">
-                    <a href="{% url 'proposalpost_detail' pk=proposalpost.pk %}">
-                        [{{ proposalpost.show_proposal_type }}]{{ proposalpost.show_title }}
-                        {% if proposalpost.proposalcomments.count %}
-                            <span class="comment-count">[{{ proposalpost.proposalcomments.count }}]</span>
-                        {% endif %}
-                    </a>
-                </td>
-                <td class="nickname">
-                        <a href="{% url 'member_info' member_pk=proposalpost.author.pk %}">{{ proposalpost.author.nickname }}</a>
-                </td>
-                <td class="date">
-                    {{ proposalpost.published_date_for_board }}
-                </td>
-                <td class="hitcount">
-                    {% get_hit_count for proposalpost %}
-                </td>
-                <td class="likes_and_hates">
-                    {{ proposalpost.likes_minus_hates }}
-                </td>
-            </tr>
+    <div class="board-table row no-gutters">
+        <div class="table-line-thick col-9 col-md-8 py-2 text-center text-700 sm-font">제목</div>
+        <div class="table-line-thick col-1 py-2 text-center text-700 sm-font d-none d-md-inline-block">글쓴이</div>
+        <div class="table-line-thick col-1 py-2 text-center text-700 sm-font">날짜</div>
+        <div class="table-line-thick col-1 py-2 text-center text-700 sm-font">조회</div>
+        <div class="table-line-thick col-1 py-2 text-center text-700 sm-font">추천</div>
+        <div class="w-100"></div>
+        {% for notice_top in notice_tops %}
+            <div class="table-line notice col-9 col-md-8 py-2 text-700">
+                <a href="{% url 'noticepost_detail' pk=notice_top.pk %}">
+                    <div class="truncate sm-font">
+                        [공지] {{ notice_top.title }}
+                    </div>
+                </a>
+            </div>
+            <div class="table-line notice col-1 py-2 text-center d-none d-md-inline-block"></div>
+            <div class="table-line notice col-1 py-2 text-center"></div>
+            <div class="table-line notice col-1 py-2 text-center"></div>
+            <div class="table-line notice col-1 py-2 text-center"></div>
+            <div class="w-100"></div>
         {% endfor %}
-        </table>
-    
-        <div class="bottom-bar">
-            <div class="search-bar">
-                <form method="GET" accept-charset="utf-8" action="{% url 'proposalpost_list' %}">
-                    {% csrf_token %}
-                    <input type="text" name="q" value="{{ q }}">
-                    <button type="submit"></button>
-                    <select name="search-option">
+        {% for proposalpost in proposalposts %}
+            <div class="table-line col-9 col-md-8 py-2">
+                <a href="{% url 'proposalpost_detail' pk=proposalpost.pk %}">
+                    <div class="truncate d-inline-block v-align sm-font">
+                        [{{ proposalpost.show_proposal_type }}]{{ proposalpost.title }}
+                    </div>
+                    {% if proposalpost.proposalcomments.count %}
+                        <div class="comment-count d-inline-block sm-font">
+                            [{{ proposalpost.proposalcomments.count }}]
+                        </div>
+                    {% endif %}
+                </a>
+            </div>
+            <div class="table-line col-1 py-2 text-center d-none d-md-inline-block">
+                <a class="xs-font" href="{% url 'member_info' member_pk=proposalpost.author.pk %}">{{ proposalpost.author.nickname }}</a>
+            </div>
+            <div class="table-line col-1 py-2 text-center d-inline-block d-md-none xs-font">
+                {{ proposalpost.published_date_for_board_phone }}
+            </div>
+            <div class="table-line col-1 py-2 text-center d-none d-md-inline-block xs-font">
+                {{ proposalpost.published_date_for_board }}
+            </div>
+            <div class="table-line col-1 py-2 text-center xs-font">
+                {% get_hit_count for proposalpost %}
+            </div>
+            <div class="table-line col-1 py-2 text-center xs-font">
+                {{ proposalpost.likes_minus_hates }}
+            </div>
+            <div class="w-100"></div>
+        {% endfor %}
+    </div>
+    <div class="bottom-bar row no-gutters">
+        <div class="search-bar col-7 col-md-4">
+            <form class="form-group" method="GET" accept-charset="utf-8" action="{% url 'proposalpost_list' %}">
+                {% csrf_token %}
+                <div class="row no-gutters">
+                    <select class="form-control form-control-sm col-3" name="search-option">
                         <option value="title">제목</option>
                         <option value="content">내용</option>
                         <option value="title-content">제목+내용</option>
                         <option value="nickname">닉네임</option>
                     </select>
-                </form>
-            </div>
-            {% if user.is_authenticated %}
-                <div class="new-post">
-                    <a class="btn btn-outline-primary" href="{% url 'proposalpost_new' %}" role="button">글쓰기</a>
+                    <input class="form-control form-control-sm mx-2 col" type="text" name="q" value="{{ q }}">
+                    <button class="btn btn-sm btn-outline-primary col-2" type="submit"><i class="fas fa-search"></i></button>
                 </div>
-            {% endif %}
+            </form>
         </div>
-    
-        <!-- pagination dispaly by Rob L from Stack Overflow -->
-        <ul class="pagination">
-            <li><a href="?page=1&q={{ q }}&search-option={{ filter_type }}">&laquo; 첫 페이지</a></li>
-            {% if proposalposts.has_previous %}
-                <li><a href="?page={{ proposalposts.previous_page_number }}&q={{ q }}&search-option={{ filter_type }}">이전</a></li>
+        {% if user.is_authenticated %}
+        <div class="new-post col-2 offset-3 offset-md-6">
+            <a class="btn btn-sm btn-outline-primary" href="{% url 'proposalpost_new' %}" role="button"><i class="fas fa-pen sm-font">글쓰기</i></a>
+        </div>
+    {% endif %}
+    </div>
+
+    <!-- pagination dispaly by Rob L from Stack Overflow -->
+    <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="?page=1&q={{ q }}&search-option={{ filter_type }}">&laquo;</a></li>
+        {% if proposalposts.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ proposalposts.previous_page_number }}&q={{ q }}&search-option={{ filter_type }}">&lt;</a></li>
+        {% endif %}
+        {% if proposalposts.number|add:'-4' > 1 %}
+        <li class="page-item"><a class="page-link" href="?page={{ proposalposts.number|add:'-5' }}&q={{ q }}&search-option={{ filter_type }}">&hellip;</a></li>
+        {% endif %}
+        {% for i in proposalposts.paginator.page_range %}
+            {% if proposalposts.number == i %}
+                <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+            {% elif i > proposalposts.number|add:'-5' and i < proposalposts.number|add:'5' %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}&q={{ q }}&search-option={{ filter_type }}">{{ i }}</a></li>
             {% endif %}
-            
-            {% if proposalposts.number|add:'-4' > 1 %}
-            <li><a href="?page={{ proposalposts.number|add:'-5' }}&q={{ q }}&search-option={{ filter_type }}">&hellip;</a></li>
-            {% endif %}
-            
-            {% for i in proposalposts.paginator.page_range %}
-                {% if proposalposts.number == i %}
-                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
-                {% elif i > proposalposts.number|add:'-5' and i < proposalposts.number|add:'5' %}
-                    <li><a href="?page={{ i }}&q={{ q }}&search-option={{ filter_type }}">{{ i }}</a></li>
-                {% endif %}
-            {% endfor %}
-            
-            {% if proposalposts.paginator.num_pages > proposalposts.number|add:'4' %}
-                <li><a href="?page={{ proposalposts.number|add:'5' }}&q={{ q }}&search-option={{ filter_type }}">&hellip;</a></li>
-            {% endif %}
-    
-            {% if proposalposts.has_next %}
-                <li><a href="?page={{ proposalposts.next_page_number }}&q={{ q }}&search-option={{ filter_type }}">다음</a></li>
-            {% endif %}
-            <li><a href="?page={{ proposalposts.paginator.num_pages }}&q={{ q }}&search-option={{ filter_type }}">끝 페이지 &raquo;</a></li>
-        </ul>
-    {% endblock %}
+        {% endfor %}
+        {% if proposalposts.paginator.num_pages > proposalposts.number|add:'4' %}
+            <li class="page-item"><a class="page-link" href="?page={{ proposalposts.number|add:'5' }}&q={{ q }}&search-option={{ filter_type }}">&hellip;</a></li>
+        {% endif %}
+        {% if proposalposts.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ proposalposts.next_page_number }}&q={{ q }}&search-option={{ filter_type }}">&gt;</a></li>
+        {% endif %}
+        <li class="page-item"><a class="page-link" href="?page={{ proposalposts.paginator.num_pages }}&q={{ q }}&search-option={{ filter_type }}">&raquo;</a></li>
+    </ul>
+{% endblock %}
     

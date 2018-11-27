@@ -1,7 +1,7 @@
 {% extends 'board/base.html' %}
 
 {% block content %}
-    <h2>회원가입</h2>
+    <h3>회원가입</h3>
     <form method="POST" action="" class="signup_form">
         {% csrf_token %}
         {% for field in form %}

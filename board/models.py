@@ -43,6 +43,22 @@ class AbstractPost(models.Model):
             return self.published_date.strftime('%H:%M')
         else:
             return self.published_date.strftime('%y.%m.%d')
+    
+    @property
+    def published_date_for_post(self):
+        return self.published_date.strftime('%Y.%m.%d %H:%M')
+    
+    @property
+    def last_edit_date_for_post(self):
+        return self.last_edit_date.strftime('%Y.%m.%d %H:%M')
+
+    @property
+    def published_date_for_board_phone(self):
+        today = timezone.now().date()
+        if self.published_date.date() == today:
+            return self.published_date.strftime('%H:%M')
+        else:
+            return self.published_date.strftime('%m.%d')
         
 
 
@@ -54,34 +70,6 @@ class FreePost(AbstractPost):
 
     class Meta:
         abstract = False
-
-    @property
-    def show_title(self):
-        if len(self.title) > 45:
-            return self.title[0:45]+"..."
-        else:
-            return self.title
-    
-    @property
-    def show_title_best(self):
-        if len(self.title) > 40:
-            return self.title[0:40]+"..."
-        else:
-            return self.title
-
-    @property
-    def show_title_home(self):
-        if len(self.title) > 24:
-            return self.title[0:24]+"..."
-        else:
-            return self.title
-    
-    @property
-    def show_title_best_home(self):
-        if len(self.title) > 65:
-            return self.title[0:65]+"..."
-        else:
-            return self.title
 
 class ReportPost(AbstractPost):
     AREA_CHOICES = (
@@ -120,41 +108,6 @@ class ReportPost(AbstractPost):
     def show_area(self):
         return self.get_area_display()
 
-    @property
-    def show_title(self):
-        specific_area_length = len(str(self.specific_area))
-        length_limit = 35-specific_area_length
-        if len(self.title) > length_limit:
-            return self.title[0:length_limit]+"..."
-        else:
-            return self.title
-    
-    @property
-    def show_title_best(self):
-        specific_area_length = len(str(self.specific_area))
-        length_limit = 30-specific_area_length
-        if len(self.title) > length_limit:
-            return self.title[0:length_limit]+"..."
-        else:
-            return self.title
-    
-    @property
-    def show_title_home(self):
-        specific_area_length = len(str(self.specific_area))
-        length_limit = 20-specific_area_length
-        if len(self.title) > length_limit:
-            return self.title[0:length_limit]+"..."
-        else:
-            return self.title
-    @property
-    def show_title_best_home(self):
-        specific_area_length = len(str(self.specific_area))
-        length_limit = 50-specific_area_length
-        if len(self.title) > length_limit:
-            return self.title[0:length_limit]+"..."
-        else:
-            return self.title
-
 class ProposalPost(AbstractPost):
     PR_CHOICES = (
         ('PP', '건의'),
@@ -172,33 +125,6 @@ class ProposalPost(AbstractPost):
     @property
     def show_proposal_type(self):
         return self.get_proposal_type_display()
-    
-    @property
-    def show_title(self):
-        if len(self.title) > 45:
-            return self.title[0:45]+"..."
-        else:
-            return self.title
-    
-    @property
-    def show_title_best(self):
-        if len(self.title) > 35:
-            return self.title[0:35]+"..."
-        else:
-            return self.title
-    
-    @property
-    def show_title_home(self):
-        if len(self.title) > 24:
-            return self.title[0:24]+"..."
-        else:
-            return self.title
-    @property
-    def show_title_best_home(self):
-        if len(self.title) > 62:
-            return self.title[0:62]+"..."
-        else:
-            return self.title
 
 class NoticePost(AbstractPost):
     NOTICE_CHOICES = (
@@ -213,33 +139,6 @@ class NoticePost(AbstractPost):
 
     class Meta:
         abstract = False
-
-    @property
-    def show_title(self):
-        if len(self.title) > 42:
-            return self.title[0:42]+"..."
-        else:
-            return self.title
-    
-    @property
-    def show_title_best(self):
-        if len(self.title) > 35:
-            return self.title[0:35]+"..."
-        else:
-            return self.title
-
-    @property
-    def show_title_home(self):
-        if len(self.title) > 24:
-            return self.title[0:24]+"..."
-        else:
-            return self.title
-    @property
-    def show_title_best_home(self):
-        if len(self.title) > 62:
-            return self.title[0:62]+"..."
-        else:
-            return self.title
 
 class AbstractComment(AbstractPost):
     title = models.CharField(max_length=200, blank=True, null=True)

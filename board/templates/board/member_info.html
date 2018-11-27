@@ -1,7 +1,7 @@
 {% extends 'board/base.html' %}
 
 {% block content %}
-    <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs" style="margin-bottom:2%;">
         <li class="nav-item">
             <a class="nav-link active" href="{% url 'member_info' member_pk=member.pk%}">회원정보</a>
         </li>
@@ -13,9 +13,9 @@
         </li>
     </ul>
     {% if member.pk == user.pk %}
-        <h2>회원정보</h2>
+        <h3>회원정보</h3>
     {% else %}
-        <h2>{{ member.nickname }}님의 회원정보</h2>
+        <h3>{{ member.nickname }}님의 회원정보</h3>
     {% endif %}
     {% if member.pk == user.pk %}
         <p>아이디: {{ member.username }}</p>

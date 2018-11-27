@@ -2,7 +2,7 @@
 {% load hitcount_tags %}
 
 {% block content %}
-    <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs" style="margin-bottom:2%;">
         <li class="nav-item">
             <a class="nav-link" href="{% url 'member_info' member_pk=member.pk%}">회원정보</a>
         </li>
@@ -14,9 +14,9 @@
         </li>
     </ul>
     {% if member.pk == user.pk %}
-        <h2>작성 글 목록</h2>
+        <h3>작성 글 목록</h3>
     {% else %}
-        <h2>{{ member.nickname }}님의 작성 글 목록</h2>
+        <h3>{{ member.nickname }}님의 작성 글 목록</h3>
     {% endif %}
     <table class="board-table">
         <tr>
@@ -26,11 +26,11 @@
             <th>추천</th>
         </tr>
         {% for memberpost in memberposts %}
-        <tr class="post">
+        <tr class="post-list">
             <td class="title">
                 {% if memberpost.board == "Free" %}
                     <a href="{% url 'freepost_detail' pk=memberpost.pk %}">
-                        {{ memberpost.show_title }} 
+                        {{ memberpost.title }} 
                         {% if memberpost.freecomments.count %}
                             <span class="comment-count">[{{ memberpost.freecomments.count }}]</span>
                         {% endif %}
@@ -72,30 +72,30 @@
     </table>
     <!-- pagination dispaly by Rob L from Stack Overflow -->
     <ul class="pagination">
-            <li><a href="?page=1">&laquo; 첫 페이지</a></li>
-            {% if memberposts.has_previous %}
-                <li><a href="?page={{ memberposts.previous_page_number }}">이전</a></li>
+        <li class="page-item"><a class="page-link" href="?page=1&q={{ q }}&search-option={{ filter_type }}">&laquo; 첫 페이지</a></li>
+        {% if memberposts.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ memberposts.previous_page_number }}&q={{ q }}&search-option={{ filter_type }}">이전</a></li>
+        {% endif %}
+        
+        {% if memberposts.number|add:'-4' > 1 %}
+        <li class="page-item"><a class="page-link" href="?page={{ memberposts.number|add:'-5' }}&q={{ q }}&search-option={{ filter_type }}">&hellip;</a></li>
+        {% endif %}
+        
+        {% for i in memberposts.paginator.page_range %}
+            {% if memberposts.number == i %}
+                <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+            {% elif i > memberposts.number|add:'-5' and i < memberposts.number|add:'5' %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}&q={{ q }}&search-option={{ filter_type }}">{{ i }}</a></li>
             {% endif %}
-            
-            {% if memberposts.number|add:'-4' > 1 %}
-            <li><a href="?page={{ memberposts.number|add:'-5' }}">&hellip;</a></li>
-            {% endif %}
-            
-            {% for i in memberposts.paginator.page_range %}
-                {% if memberposts.number == i %}
-                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
-                {% elif i > memberposts.number|add:'-5' and i < memberposts.number|add:'5' %}
-                    <li><a href="?page={{ i }}">{{ i }}</a></li>
-                {% endif %}
-            {% endfor %}
-            
-            {% if memberposts.paginator.num_pages > memberposts.number|add:'4' %}
-                <li><a href="?page={{ memberposts.number|add:'5' }}">&hellip;</a></li>
-            {% endif %}
-    
-            {% if memberposts.has_next %}
-                <li><a href="?page={{ memberposts.next_page_number }}">다음</a></li>
-            {% endif %}
-            <li><a href="?page={{ memberposts.paginator.num_pages }}">끝 페이지 &raquo;</a></li>
-        </ul>
+        {% endfor %}
+        
+        {% if memberposts.paginator.num_pages > memberposts.number|add:'4' %}
+            <li class="page-item"><a class="page-link" href="?page={{ memberposts.number|add:'5' }}&q={{ q }}&search-option={{ filter_type }}">&hellip;</a></li>
+        {% endif %}
+
+        {% if memberposts.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ memberposts.next_page_number }}&q={{ q }}&search-option={{ filter_type }}">다음</a></li>
+        {% endif %}
+        <li class="page-item"><a class="page-link" href="?page={{ memberposts.paginator.num_pages }}&q={{ q }}&search-option={{ filter_type }}">끝 페이지 &raquo;</a></li>
+    </ul>
 {% endblock %}

@@ -3,62 +3,106 @@
 
 {% block content %}
     <div class="post">
-        <div class="date">
-            작성일자: {{ reportpost.published_date }}
+        <div class="post-title">
+            <a href="{% url 'reportpost_detail' pk=reportpost.pk %}">[{{ reportpost.show_area }}][{{ reportpost.specific_area }}]{{ reportpost.title }}</a>
+            <span class="post-date">{{ reportpost.published_date_for_post }}</span>
         </div>
-        <div class="hitcount">
-            조회수: {% get_hit_count for reportpost %}
+        <div class="post-info">
+            <span class="author_name"><a href="{% url 'member_info' member_pk=reportpost.author.pk %}">{{ reportpost.author.nickname }}</a></span>
+            <span class="post-minor-info">
+                조회수 <strong>{% get_hit_count for reportpost %}</strong>&nbsp;&nbsp;
+                수정횟수 <strong>{{ reportpost.number_of_edits }}</strong>&nbsp;&nbsp;
+                마지막 수정일시 <strong>{{ reportpost.last_edit_date_for_post }}</strong>
+            </span>
         </div>
-        <div class="number_of_edits">수정횟수: {{ reportpost.number_of_edits }}</div>
-        <div class="last_edit_date">마지막 수정일시: {{ reportpost.last_edit_date }}</div>
-        <span class="control hidden" id = "control_id{{ forloop.counter0 }}">
-            <a class="btn btn-default" href="{% url 'reportpost_edit' pk=reportpost.pk %}" onclick="return confirm('글을 수정하시겠습니까?')">수정</a>
-            <a class="btn btn-default" href="{% url 'reportpost_remove' pk=reportpost.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
-        </span>
-        <div class="author_name">{{ reportpost.author.nickname }}</div>
-        <h1>{{ reportpost.title }}</h1>
-        {% if reportpost.image %}
-            <img class="post_image" src="{{ reportpost.image.url }}" alt="">
-        {% endif %}
-        <div class="content">{{ reportpost.content|linebreaksbr }}</div>
-        <input type="button" class="post_like" name="{{ reportpost.pk }}" value="좋아요">
-        <span class="like_count" id="count{{ reportpost.pk }}_like">{{ reportpost.total_likes }}</span>
-        <input type="button" class="post_hate" name="{{ reportpost.pk }}" value="싫어요">
-        <span class="hate_count" id="count{{ reportpost.pk }}_hate">{{ reportpost.total_hates }}</span>
+        <div class="content">
+            {% if reportpost.image %}
+                <img class="img-fluid mx-auto d-block" src="{{ reportpost.image.url }}" alt="" style="margin: 2%;">
+            {% endif %}
+            <p>{{ reportpost.content|linebreaksbr }}</p>
+            <div style="text-align: center;">
+                <span class="post_like btn btn-outline-danger" name="{{ reportpost.pk }}">
+                    <i class="fas fa-thumbs-up">추천</i>
+                    <span id="count{{ reportpost.pk }}_like">{{ reportpost.total_likes }}</span>
+                </span>
+                &nbsp;&nbsp;
+                <span class="post_hate btn btn-outline-primary" name="{{ reportpost.pk }}">
+                    <i class="fas fa-thumbs-down">비추</i>
+                    <span id="count{{ reportpost.pk }}_hate">{{ reportpost.total_hates }}</span>
+                </span>
+            </div>
+        </div>
     </div>
-    <a class="btn btn-default" href="{% url 'reportpost_list' %}">목록</a>
-    {% if user.is_authenticated %}
-        <a class="btn btn-default" href="{% url 'reportpost_new' %}">글쓰기</a>
-    {% endif %}
-    <hr>
+    <span class="control hidden" id = "control_id{{ forloop.counter0 }}">
+            <a class="btn btn-outline-success" href="{% url 'reportpost_edit' pk=reportpost.pk %}" onclick="return confirm('글을 수정하시겠습니까?')"><i class="fas fa-edit"></i>수정</a>
+            <a class="btn btn-outline-danger" href="{% url 'reportpost_remove' pk=reportpost.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')"><i class="fas fa-trash-alt"></i>삭제</a>
+    </span>
+    <div style="text-align: right;">
+        <a class="btn btn-outline-primary" href="{% url 'reportpost_list' %}">목록</a>
+        {% if user.is_authenticated %}
+            <a class="btn btn-outline-primary" href="{% url 'reportpost_new' %}">글쓰기</a>
+        {% endif %}
+    </div>
+
+    <div class="comment-show-hide">
+            <p>&nbsp;&nbsp;<i class="fas fa-comment-dots">댓글</i> : <strong>{{ reportpost.reportcomments.count }}</strong> 개</p>
+    </div>
+    {% for reportcomment in reportpost.reportcomments.all %}
+        <div class="comment">
+            <div class="comment-info">
+                <strong>{{ forloop.counter }}.</strong>
+                <span class="author_name"><a href="{% url 'member_info' member_pk=reportcomment.author.pk %}">{{ reportcomment.author.nickname }}</a></span>
+                <span>
+                {% if reportpost.author == reportcomment.author %}
+                    <a href="{% url 'member_info' member_pk=reportcomment.author.pk %}">
+                        <small>(글쓴이)</small>
+                    </a>
+                {% endif %}
+                </span>
+                <span class="date">{{ reportcomment.published_date_for_post }}</span>
+                <span class="control hidden" id = "control_id{{ forloop.counter0 }}">
+                    <a href="{% url 'reportcomment_edit' pk=reportcomment.pk %}" onclick="return confirm('글을 수정하시겠습니까?')"><small>수정</small></a>
+                    <a href="{% url 'reportcomment_remove' pk=reportcomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')"><small>삭제</small></a>
+                </span>
+                <span style="position: absolute; right:2%;">
+                    <div>
+                        <span class="comment_like btn btn-sm btn-outline-danger" name="{{ reportcomment.pk }}">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span style="font-size: 0.7rem;" id="count{{ reportcomment.pk }}_like_comment">{{ reportcomment.total_likes }}</span>
+                        </span>
+                        <span class="comment_hate btn btn-sm btn-outline-primary" name="{{ reportcomment.pk }}">
+                            <i class="fas fa-thumbs-down"></i>
+                            <span style="font-size: 0.7rem;" id="count{{ reportcomment.pk }}_hate_comment">{{ reportcomment.total_hates }}</span>
+                        </span>
+                    </div>
+                </span>
+                <div class="comment-minor-info">
+                    <span class="number_of_edits">수정횟수: {{ reportcomment.number_of_edits }}</span>
+                    &nbsp;
+                    <span class="last_edit_date">마지막 수정일시: {{ reportcomment.last_edit_date_for_post }}</span>
+                </div>
+            </div>
+            <div class="content">{{ reportcomment.content|linebreaks }}</div>
+        </div>
+        <hr>
+    {% empty %}
+        <div class="empty">댓글이 없습니다.</div>
+    {% endfor %}
     {% if user.is_authenticated %}
         <form method="POST" class="post-form" action="{% url 'add_reportcomment_to_reportpost' pk=reportpost.pk %}">
             {% csrf_token %}
-            <input type="text" name="reportcomment_form" class="comment_form">
-            <button type="submit" class="save btn btn-default" onclick="return confirm('댓글을 등록하시겠습니까?')">등록</button>
+            <div class="form-row">
+                <div class="col-10">
+                    <input type="text" name="reportcomment_form" class="comment_form form-control" placeholder="댓글을 입력하세요">
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="save btn btn-outline-dark form-control" onclick="return confirm('댓글을 등록하시겠습니까?')"><i class="fas fa-pen"> 등록</i></button>
+                </div>
+            </div>
         </form>
     {% else %}
         <div class="need_login"><a href="{% url 'login' %}" class="top-menu">로그인</a> 후 댓글 달기</div>
     {% endif %}
-    {% for reportcomment in reportpost.reportcomments.all %}
-        <div class="comment">
-            <div class="date">{{ reportcomment.published_date }}</div>
-            <div class="number_of_edits">수정횟수: {{ reportcomment.number_of_edits }}</div>
-            <div class="last_edit_date">마지막 수정일시: {{ reportcomment.last_edit_date }}</div>
-            <span class="control hidden" id = "control_id{{ forloop.counter0 }}">
-                <a class="btn btn-default" href="{% url 'reportcomment_edit' pk=reportcomment.pk %}" onclick="return confirm('글을 수정하시겠습니까?')">수정</a>
-                <a class="btn btn-default" href="{% url 'reportcomment_remove' pk=reportcomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
-            </span>
-            <div class="author_name">{{ reportcomment.author.nickname }}</div>
-            <div class="content">{{ reportcomment.content|linebreaks }}</div>
-            <input type="button" class="comment_like" name="{{ reportcomment.pk }}" value="좋아요">
-            <span class="like_count" id="count{{ reportcomment.pk }}_like_comment">{{ reportcomment.total_likes }}</span>
-            <input type="button" class="comment_hate" name="{{ reportcomment.pk }}" value="싫어요">
-            <span class="hate_count" id="count{{ reportcomment.pk }}_hate_comment">{{ reportcomment.total_hates }}</span>
-        </div>
-    {% empty %}
-        <div class="empty">댓글이 없습니다.</div>
-    {% endfor %}
     <a class="btn btn-default" href="{% url 'reportpost_list' %}">목록</a>
     {% if user.is_authenticated %}
         <a class="btn btn-default" href="{% url 'reportpost_new' %}">글쓰기</a>
@@ -82,7 +126,8 @@
                   alert(response.message);
                 },
                 error:function(request,status,error){
-                  alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                // alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                    alert("로그인이 필요합니다");
                 }
             });
         })
@@ -102,7 +147,8 @@
                   alert(response.message);
                 },
                 error:function(request,status,error){
-                  alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                // alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                    alert("로그인이 필요합니다");
                 }
             });
         })
@@ -122,7 +168,8 @@
                   alert(response.message);
                 },
                 error:function(request,status,error){
-                  alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                    // alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                    alert("로그인이 필요합니다");
                 }
             });
         })
@@ -142,7 +189,8 @@
                   alert(response.message);
                 },
                 error:function(request,status,error){
-                  alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                // alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                    alert("로그인이 필요합니다");
                 }
             });
         })
