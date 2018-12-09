@@ -5,3 +5,6 @@ myvenv
 db.sqlite3
 /static
 .DS_Store
+*.log
+uploads/
+secret_key.py
