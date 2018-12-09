@@ -1,15 +1,49 @@
 {% extends 'board/base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-    <h3>자유게시판 글쓰기</h3>
+    <div class="board-explanation row no-gutters pl-3">
+        <div class="col">
+            <div class="md-font text-700">자유게시판 글쓰기</div>
+            <div class="xs-font my-3">
+                뭘봐의 제보게시판입니다. 게시글의 모든 저작권은 작성자에게 있습니다.<br>
+            </div>
+        </div>
+    </div>
     <form method="POST" class="post-form" enctype="multipart/form-data">
         {% csrf_token %}
-        {% for field in form %}
-            <div class="form-group">
-                {{ field.label }}
-                {{ field }}
+        <div class="row no-gutters">
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+
+            <div class="col">{{ form.title|as_crispy_field }}</div>
+            <div class="w-100"></div>
+
+            <div class="col">{{ form.image|as_crispy_field }}</div>
+            <div class="w-100"></div>
+
+            {{ formset.management_form }}
+            <button class="col-1 btn btn-sm btn-outline-success xs-font" type="button" data-toggle="collapse" data-target="#collapseImageForm0" aria-expanded="false" aria-controls="collapseImageForm">
+                <i class="fas fa-plus"></i>
+            </button>
+            <div class="w-100"></div>
+            {% for imageform in formset %}
+                <div class="collapse py-2" id="collapseImageForm{{ forloop.counter0 }}">
+                    <div class="col pb-3">{{ imageform }}</div>
+                    <div class="w-100"></div>
+                    <button class="col-1 btn btn-sm btn-outline-success xs-font" type="button" data-toggle="collapse" data-target="#collapseImageForm{{ forloop.counter }}" aria-expanded="false" aria-controls="collapseImageForm">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <div class="w-100"></div>
+                </div> 
+                <div class="w-100"></div>
+            {% endfor %}
+            <div class="col py-2">{{ form.content|as_crispy_field }}</div>
+            <div class="w-100"></div>
+            <div class="col-2 offset-10 text-right">
+                <button type="submit" class="btn btn-outline-primary text-center">저장</button>
             </div>
-        {% endfor %}
-        <button type="submit" class="save btn btn-default">저장</button>
+        </div>
     </form>
 {% endblock %}

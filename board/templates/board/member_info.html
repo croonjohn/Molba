@@ -1,29 +1,43 @@
 {% extends 'board/base.html' %}
 
 {% block content %}
-    <ul class="nav nav-tabs" style="margin-bottom:2%;">
-        <li class="nav-item">
-            <a class="nav-link active" href="{% url 'member_info' member_pk=member.pk%}">회원정보</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'memberpost_list' member_pk=member.pk%}">작성 글</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'membercomment_list' member_pk=member.pk%}">작성 댓글</a>
-        </li>
-    </ul>
+    <div class="row no-gutters mt-3">
+        <ul class="nav nav-tabs col px-1 py-2" style="margin-bottom:2%;">
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url 'member_info' member_pk=member.pk%}">회원정보</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'memberpost_list' member_pk=member.pk%}">작성 글</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'membercomment_list' member_pk=member.pk%}">작성 댓글</a>
+            </li>
+        </ul>
+    </div>
+    <div class="row no-gutters mt-3">
     {% if member.pk == user.pk %}
-        <h3>회원정보</h3>
+        <div class="col px-3 py-2 lg-font">회원정보</div>
+        <div class="w-100"></div>
     {% else %}
-        <h3>{{ member.nickname }}님의 회원정보</h3>
+        <div class="col px-3 py-2 lg-font">{{ member.nickname.nickname }}님의 회원정보</div>
+        <div class="w-100"></div>
     {% endif %}
     {% if member.pk == user.pk %}
-        <p>아이디: {{ member.username }}</p>
+        <div class="col px-3 py-2 sm-font">아이디: {{ member.username }}</div>
+        <div class="w-100"></div>
     {% endif %}
-    <p>닉네임: {{ member.nickname }}</p>
-    <p>가입일: {{ member.signup_date }}</p>
-    <p>마지막 로그인 일시: {{ member.last_login }}</p>
+        <div class="col px-3 py-2 sm-font">닉네임: {{ member.nickname.nickname }}</div>
+        <div class="w-100"></div>
+        <div class="col px-3 py-2 sm-font">가입일: {{ member.date_joined }}</div>
+        <div class="w-100"></div>
+        <div class="col px-3 py-2 sm-font">마지막 로그인 일시: {{ member.last_login }}</div>
+        <div class="w-100"></div>
     {% if member == user %}
-        <a href="{% url 'member_info_change' member_pk=user.pk %}">회원정보 변경</a>
+        <div class="col px-3 py-2 sm-font">
+            <a class="sm-font mr-3" href="{% url 'change_nickname' member_pk=member.pk %}">닉네임 변경</a>
+            <a class="sm-font ml-3" href="{% url 'change_password' member_pk=member.pk %}">비밀번호 변경</a>
+        </div>
+        <div class="w-100"></div>
     {% endif %}
+    </div>
 {% endblock %}

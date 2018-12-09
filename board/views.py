@@ -1,13 +1,19 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import (
-    FreePost, ReportPost, ProposalPost, NoticePost, FreeComment, ReportComment, ProposalComment, NoticeComment
+    Nickname,
+    FreePost, ReportPost, ProposalPost, NoticePost, 
+    FreeComment, ReportComment, ProposalComment, NoticeComment,
+    FreeImages, ReportImages, ProposalImages, NoticeImages
     )
 from django.utils import timezone
 from .forms import (
-    FreePostForm, ReportPostForm, ProposalPostForm, NoticePostForm, FreeCommentForm, ReportCommentForm, ProposalCommentForm, NoticeCommentForm, UserForm, UserChangeForm
+    FreePostForm, ReportPostForm, ProposalPostForm, NoticePostForm,
+    FreeCommentForm, ReportCommentForm, ProposalCommentForm, NoticeCommentForm,
+    FreeImagesForm, ReportImagesForm, ProposalImagesForm, NoticeImagesForm,
+    SignupForm, NicknameForm, ChangePasswordForm,
 )
 from django.contrib.auth.models import User
-from django.contrib.auth import login
+from django.contrib.auth import login, update_session_auth_hash
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
@@ -23,7 +29,8 @@ from hitcount.views import HitCountMixin
 from itertools import chain
 import operator
 from django.db.models import Q
-
+from django.forms import modelformset_factory
+from django.contrib import messages
 
 def freepost_list(request):
     freepost_listing = FreePost.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
@@ -215,18 +222,67 @@ def member_info(request, member_pk):
     return render(request, 'board/member_info.html', {'member': member})
 
 @login_required
-def member_info_change(request, member_pk):
+def change_nickname(request, member_pk):
     member = User.objects.get(pk=member_pk)
+    nickname = Nickname.objects.get(user=member)
+    original_nickname = str(nickname.nickname)
+
     if request.method == "POST":
-        form = UserChangeForm(request.POST, instance=member)
+        form = NicknameForm(request.POST, instance=nickname)
+
         if form.is_valid():
-            member = form.save(commit=False)
-            member.save()
-            message = "회원정보가 변경되었습니다."
-            return redirect('member_info')
+            nickname = form.save(commit=False)
+            nickname.save()
+            memberpost_listed = sorted(
+                chain(
+                    FreePost.objects.filter(author_nickname__icontains=original_nickname),
+                    ReportPost.objects.filter(author_nickname__icontains=original_nickname),
+                    ProposalPost.objects.filter(author_nickname__icontains=original_nickname),
+                    NoticePost.objects.filter(author_nickname__icontains=original_nickname)
+                ),
+                key=lambda post: post.published_date, reverse=True
+                )
+            for post in memberpost_listed:
+                post.author_nickname = str(nickname.nickname)
+                post.save()
+            
+            messages.success(request, "닉네임이 변경되었습니다.")
+
+            return redirect('member_info', member_pk=member_pk)
+
     else:
-        form = UserChangeForm(instance=member)
-        return render(request, 'board/member_info_change.html', {'form': form, 'member': member})
+        if member == User.objects.get(pk = request.user.pk): 
+            form = NicknameForm(instance=nickname)
+            return render(request, 'board/change_nickname.html', {'form': form, 'member_pk': member.pk})
+        else:
+            return HttpResponse("다른 유저의 닉네임은 수정할 수 없습니다.")
+    
+    return render(request, 'board/change_nickname.html', {'form': form, 'member_pk': member.pk})
+
+@login_required
+def change_password(request, member_pk):
+    member = User.objects.get(pk=member_pk)
+
+    if request.method == "POST":
+        form = ChangePasswordForm(member, request.POST)
+
+        if form.is_valid():
+            member_changed = form.save()
+            update_session_auth_hash(request, member_changed)
+            messages.success(request, "비밀번호가 변경되었습니다.")
+            return redirect('member_info', member_pk=member_pk)
+        else:
+            messages.error(request, "아래의 오류를 수정해주시기 바랍니다.")
+
+    else:
+        if member == User.objects.get(pk = request.user.pk): 
+            form = ChangePasswordForm(member, request.POST)
+            return render(request, 'board/change_password.html', {'form': form, 'member_pk': member.pk})
+        else:
+            return HttpResponse("다른 유저의 비밀번호는 수정할 수 없습니다.")
+    
+    return render(request, 'board/change_password.html', {'form': form, 'member_pk': member.pk})
+
 
 def home(request):
     bestpost_listing = sorted(
@@ -251,7 +307,31 @@ def home(request):
     noticepost_listing = NoticePost.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
     noticeposts = noticepost_listing[0:5]
 
-    context = {'bestposts': bestposts, 'freeposts': freeposts, 'reportposts': reportposts, 'proposalposts': proposalposts, 'noticeposts': noticeposts}
+    SE = len(ReportPost.objects.filter(area__icontains="SE"))
+    IC = len(ReportPost.objects.filter(area__icontains="IC"))
+    GG = len(ReportPost.objects.filter(area__icontains="GG"))
+    DJ = len(ReportPost.objects.filter(area__icontains="DJ"))
+    SJ = len(ReportPost.objects.filter(area__icontains="SJ"))
+    CB = len(ReportPost.objects.filter(area__icontains="CB"))
+    CN = len(ReportPost.objects.filter(area__icontains="CN"))
+    GW = len(ReportPost.objects.filter(area__icontains="GW"))
+    GJ = len(ReportPost.objects.filter(area__icontains="GJ"))
+    JB = len(ReportPost.objects.filter(area__icontains="JB"))
+    JN = len(ReportPost.objects.filter(area__icontains="JN"))
+    BS = len(ReportPost.objects.filter(area__icontains="BS"))
+    DG = len(ReportPost.objects.filter(area__icontains="DG"))
+    US = len(ReportPost.objects.filter(area__icontains="US"))
+    GB = len(ReportPost.objects.filter(area__icontains="GB"))
+    GN = len(ReportPost.objects.filter(area__icontains="GN"))
+    JJ = len(ReportPost.objects.filter(area__icontains="JJ"))
+
+    context = {
+        'bestposts': bestposts, 'freeposts': freeposts, 'reportposts': reportposts, 
+        'proposalposts': proposalposts, 'noticeposts': noticeposts,
+        'SE': SE, 'IC': IC, 'GG': GG, 'DJ': DJ, 'SJ': SJ, 'CB': CB, 'CN': CN,
+        'GW': GW, 'GJ': GJ, 'JB': JB, 'JN': JN, 'BS': BS, 'DG': DG, 'US': US,
+        'GB': GB, 'GN': GN, 'JJ': JJ
+        }
     return render(request, 'board/home.html', context)
 
 def freepost_detail(request, pk):
@@ -280,118 +360,242 @@ def noticepost_detail(request, pk):
 
 @login_required
 def freepost_new(request):
+
+    ImageFormSet = modelformset_factory(FreeImages, form=FreeImagesForm, extra=10)
+
     if request.method == "POST":
         form = FreePostForm(request.POST, request.FILES)
-        if form.is_valid():
+        formset = ImageFormSet(request.POST, request.FILES, queryset=FreeImages.objects.none())
+        
+        if form.is_valid() and formset.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            post.author_nickname = request.user.nickname
+            post.author_nickname = request.user.nickname.nickname
             post.save()
+
+            for imageform in formset.cleaned_data:
+                if len(imageform):
+                    image = imageform['image']
+                    photo = FreeImages(post=post, image=image)
+                    photo.save()
+                else:
+                    pass
+
             return redirect('freepost_detail', pk=post.pk)
+        
+        else:
+            print(form.errors, formset.errors)
+
     else:
         form = FreePostForm()
-    return render(request, 'board/freepost_edit.html', {'form': form})
+        formset = ImageFormSet(queryset=FreeImages.objects.none())
+
+    return render(request, 'board/freepost_edit.html', {'form': form, 'formset': formset})
 
 @login_required
 def reportpost_new(request):
+
+    ImageFormSet = modelformset_factory(ReportImages, form=ReportImagesForm, extra=10, min_num=1)
+
     if request.method == "POST":
         form = ReportPostForm(request.POST, request.FILES)
-        if form.is_valid():
+        formset = ImageFormSet(request.POST, request.FILES, queryset=ReportImages.objects.none())
+
+        if form.is_valid() and formset.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            post.author_nickname = request.user.nickname
+            post.author_nickname = request.user.nickname.nickname
             post.save()
+
+            for imageform in formset.cleaned_data:
+                if len(imageform):
+                    image = imageform['image']
+                    photo = ReportImages(post=post, image=image)
+                    photo.save()
+                
             return redirect('reportpost_detail', pk=post.pk)
+
+        else:
+            print(form.errors, formset.errors)
+
     else:
         form = ReportPostForm()
-    return render(request, 'board/reportpost_edit.html', {'form': form})
+        formset = ImageFormSet(queryset=ReportImages.objects.none())
+        
+    return render(request, 'board/reportpost_edit.html', {'form': form, 'formset': formset})
 
 @login_required
 def proposalpost_new(request):
+
+    ImageFormSet = modelformset_factory(ProposalImages, form=ProposalImagesForm, extra=10)
+
     if request.method == "POST":
         form = ProposalPostForm(request.POST, request.FILES)
-        if form.is_valid():
+        formset = ImageFormSet(request.POST, request.FILES, queryset=ProposalImages.objects.none())
+
+        if form.is_valid() and formset.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            post.author_nickname = request.user.nickname
+            post.author_nickname = request.user.nickname.nickname
             post.save()
+
+            for imageform in formset.cleaned_data:
+                if len(imageform):
+                    image = imageform['image']
+                    photo = ProposalImages(post=post, image=image)
+                    photo.save()
+                
             return redirect('proposalpost_detail', pk=post.pk)
+
+        else:
+            print (form.errors, formset.errors)
+
     else:
         form = ProposalPostForm()
-    return render(request, 'board/proposalpost_edit.html', {'form': form})
+        formset = ImageFormSet(queryset=ProposalImages.objects.none())
+        
+    return render(request, 'board/proposalpost_edit.html', {'form': form, 'formset': formset})
 
 @login_required
 @staff_member_required
 def noticepost_new(request):
+
+    ImageFormSet = modelformset_factory(NoticeImages, form=NoticeImagesForm, extra=10)
+
     if request.method == "POST":
         form = NoticePostForm(request.POST, request.FILES)
-        if form.is_valid():
+        formset = ImageFormSet(request.POST, request.FILES, queryset=NoticeImages.objects.none())
+
+        if form.is_valid() and formset.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            post.author_nickname = request.user.nickname
+            post.author_nickname = request.user.nickname.nickname
             post.save()
+
+            for imageform in formset.cleaned_data:
+                if len(imageform):
+                    image = imageform['image']
+                    photo = NoticeImages(post=post, image=image)
+                    photo.save()
+                
             return redirect('noticepost_detail', pk=post.pk)
+
+        else:
+            print (form.errors, formset.errors)
+
     else:
         form = NoticePostForm()
-    return render(request, 'board/noticepost_edit.html', {'form': form})
+        formset = ImageFormSet(queryset=NoticeImages.objects.none())
+        
+    return render(request, 'board/noticepost_edit.html', {'form': form, 'formset': formset})
 
 @login_required
 def freepost_edit(request, pk):
     post = get_object_or_404(FreePost, pk=pk)
+    ImageFormSet = modelformset_factory(FreeImages, form=FreeImagesForm, extra=9)
+
     if request.method == "POST":
         form = FreePostForm(request.POST, request.FILES, instance=post)
-        if form.is_valid():
+        formset = ImageFormSet(request.POST, request.FILES, queryset=FreeImages.objects.filter(post=post))
+
+        if form.is_valid() and formset.is_valid():
             post = form.save(commit=False)
             post.author = request.user
             post.last_edit_date = timezone.now()
             post.number_of_edits += 1
-            post.author_nickname = request.user.nickname
+            post.author_nickname = request.user.nickname.nickname
             post.save()
+
+            for imageform in formset.cleaned_data:
+                if len(imageform):
+                    image = imageform['image']
+                    photo = FreeImages(post=post, image=image)
+                    photo.save()
+                else:
+                    pass
+                
             return redirect('freepost_detail', pk=post.pk)
+
+        else:
+            print (form.errors, formset.errors)
+
     else:
         if post.author == User.objects.get(username = request.user.get_username()): 
             form = FreePostForm(instance=post)
-            return render(request, 'board/freepost_edit.html', {'form': form})
+            formset = ImageFormSet(queryset=FreeImages.objects.filter(post=post))
+            return render(request, 'board/freepost_edit.html', {'form': form, 'formset': formset})
         else:
             return HttpResponse('작성자가 아닙니다.')
 
 @login_required
 def reportpost_edit(request, pk):
     post = get_object_or_404(ReportPost, pk=pk)
+    ImageFormSet = modelformset_factory(ReportImages, form=ReportImagesForm, extra=9)
+
     if request.method == "POST":
         form = ReportPostForm(request.POST, request.FILES, instance=post)
-        if form.is_valid():
+        formset = ImageFormSet(request.POST, request.FILES, queryset=ReportImages.objects.filter(post=post))
+
+        if form.is_valid() and formset.is_valid():
             post = form.save(commit=False)
             post.author = request.user
             post.last_edit_date = timezone.now()
             post.number_of_edits += 1
-            post.author_nickname = request.user.nickname
+            post.author_nickname = request.user.nickname.nickname
             post.save()
+
+            for imageform in formset.cleaned_data:
+                if len(imageform):
+                    image = imageform['image']
+                    photo = ReportImages(post=post, image=image)
+                    photo.save()
+                
             return redirect('reportpost_detail', pk=post.pk)
+
+        else:
+            print (form.errors, formset.errors)
+
     else:
         if post.author == User.objects.get(username = request.user.get_username()): 
             form = ReportPostForm(instance=post)
-            return render(request, 'board/reportpost_edit.html', {'form': form})
+            formset = ImageFormSet(queryset=ReportImages.objects.filter(post=post))
+            return render(request, 'board/reportpost_edit.html', {'form': form, 'formset': formset})
         else:
             return HttpResponse('작성자가 아닙니다.')
 
 @login_required
 def proposalpost_edit(request, pk):
     post = get_object_or_404(ProposalPost, pk=pk)
+    ImageFormSet = modelformset_factory(ProposalImages, form=ProposalImagesForm, extra=9)
+
     if request.method == "POST":
         form = ProposalPostForm(request.POST, request.FILES, instance=post)
-        if form.is_valid():
+        formset = ImageFormSet(request.POST, request.FILES, queryset=ProposalImages.objects.filter(post=post))
+
+        if form.is_valid() and formset.is_valid():
             post = form.save(commit=False)
             post.author = request.user
             post.last_edit_date = timezone.now()
             post.number_of_edits += 1
-            post.author_nickname = request.user.nickname
+            post.author_nickname = request.user.nickname.nickname
             post.save()
+
+            for imageform in formset.cleaned_data:
+                if len(imageform):
+                    image = imageform['image']
+                    photo = ProposalImages(post=post, image=image)
+                    photo.save()
+                
             return redirect('proposalpost_detail', pk=post.pk)
+
+        else:
+            print (form.errors, formset.errors)
+
     else:
         if post.author == User.objects.get(username = request.user.get_username()): 
             form = ProposalPostForm(instance=post)
-            return render(request, 'board/proposalpost_edit.html', {'form': form})
+            formset = ImageFormSet(queryset=ProposalImages.objects.filter(post=post))
+            return render(request, 'board/proposalpost_edit.html', {'form': form, 'formset': formset})
         else:
             return HttpResponse('작성자가 아닙니다.')
 
@@ -399,20 +603,36 @@ def proposalpost_edit(request, pk):
 @staff_member_required
 def noticepost_edit(request, pk):
     post = get_object_or_404(NoticePost, pk=pk)
+    ImageFormSet = modelformset_factory(NoticeImages, form=NoticeImagesForm, extra=9)
+
     if request.method == "POST":
         form = NoticePostForm(request.POST, request.FILES, instance=post)
-        if form.is_valid():
+        formset = ImageFormSet(request.POST, request.FILES, queryset=NoticeImages.objects.filter(post=post))
+
+        if form.is_valid() and formset.is_valid():
             post = form.save(commit=False)
             post.author = request.user
             post.last_edit_date = timezone.now()
             post.number_of_edits += 1
-            post.author_nickname = request.user.nickname
+            post.author_nickname = request.user.nickname.nickname
             post.save()
+
+            for imageform in formset.cleaned_data:
+                if len(imageform):
+                    image = imageform['image']
+                    photo = NoticeImages(post=post, image=image)
+                    photo.save()
+                
             return redirect('noticepost_detail', pk=post.pk)
+
+        else:
+            print (form.errors, formset.errors)
+
     else:
         if post.author == User.objects.get(username = request.user.get_username()): 
             form = NoticePostForm(instance=post)
-            return render(request, 'board/noticepost_edit.html', {'form': form})
+            formset = ImageFormSet(queryset=NoticeImages.objects.filter(post=post))
+            return render(request, 'board/noticepost_edit.html', {'form': form, 'formset': formset})
         else:
             return HttpResponse('작성자가 아닙니다.')
 @login_required
@@ -527,16 +747,23 @@ def add_noticecomment_to_noticepost(request, pk):
 
 def signup(request):
     if request.method == "POST":
-        form = UserForm(request.POST)
-        if form.is_valid():
-            new_user = User.objects.create_user(**form.cleaned_data)
+        form = SignupForm(request.POST)
+        nickname_form = NicknameForm(request.POST)
+        new_user_nickname = request.POST.get('nickname')
+
+        if form.is_valid() and nickname_form.is_valid():
+            new_user = form.save()
+            Nickname.objects.create(
+                user = new_user,
+                nickname = new_user_nickname
+            )
             login(request, new_user)
             return redirect('home')
-        else:
-            return HttpResponse('이미 존재하는 아이디입니다')
     else:
-        form = UserForm()
-        return render(request, 'board/signup.html', {'form': form})
+        form = SignupForm()
+        nickname_form = NicknameForm
+    
+    return render(request, 'board/signup.html', {'form': form, 'nickname_form': nickname_form})
 
 # 좋아요/싫어요 기능. 출처: 초보몽키의 개발공부로그
 @login_required
@@ -1087,4 +1314,3 @@ def top_search_view(request):
     page = request.GET.get('page')
     searchposts = paginator.get_page(page)
     return render(request, 'board/searchpost_list.html', {'searchposts': searchposts, 'q': filter_content})
-

@@ -1,9 +1,56 @@
 {% extends 'board/base.html' %}
+{% load staticfiles%}
 
 {% block content %}
+    <div class="row no-gutters mt-4">
+        <div class="col">
+            <span class="report-status xs-font">
+                전국 제보 현황<br><br>
+                <a href="/report/?search-option=area&q=서울">서울: {{ SE }}</a><br> 
+                <a href="/report/?search-option=area&q=인천">인천: {{ IC }}</a><br> 
+                <a href="/report/?search-option=area&q=경기">경기: {{ GG }}</a><br> 
+                <a href="/report/?search-option=area&q=대전">대전: {{ DJ }}</a><br> 
+                <a href="/report/?search-option=area&q=세종">세종: {{ SJ }}</a><br> 
+                <a href="/report/?search-option=area&q=충북">충북: {{ CB }}</a><br> 
+                <a href="/report/?search-option=area&q=충남">충남: {{ CN }}</a><br> 
+                <a href="/report/?search-option=area&q=강원">강원: {{ GW }}</a><br> 
+                <a href="/report/?search-option=area&q=광주">광주: {{ GJ }}</a><br> 
+                <a href="/report/?search-option=area&q=전북">전북: {{ JB }}</a><br> 
+                <a href="/report/?search-option=area&q=전남">전남: {{ JN }}</a><br> 
+                <a href="/report/?search-option=area&q=부산">부산: {{ BS }}</a><br> 
+                <a href="/report/?search-option=area&q=대구">대구: {{ DG }}</a><br> 
+                <a href="/report/?search-option=area&q=울산">울산: {{ US }}</a><br> 
+                <a href="/report/?search-option=area&q=경북">경북: {{ GB }}</a><br> 
+                <a href="/report/?search-option=area&q=경남">경남: {{ GN }}</a><br> 
+                <a href="/report/?search-option=area&q=제주">제주: {{ JJ }}</a>
+            </span>
+            <img class="responsive-image" src="{% static 'images/South_Korea_map.svg' %}" alt="제보분포지도" usemap="#report-map">
+            <map name="report-map">
+                <area target="_self" alt="Seoul" title="Seoul" href="/report/?search-option=area&q=서울" coords="296,209,288,211,282,217,276,223,270,225,265,223,262,227,267,232,268,237,272,242,278,245,284,245,297,243,306,238,304,233,307,225,300,224,299,217,298,213" shape="poly">
+                <area target="_self" alt="Gyeonggi" title="Gyeonggi" href="/report/?search-option=area&q=경기" coords="300,122,300,131,305,137,309,142,320,139,323,144,321,145,324,151,336,150,340,155,340,160,345,166,355,174,356,181,352,187,348,193,347,200,350,207,351,217,357,218,366,222,380,225,385,229,379,233,376,237,379,233,378,242,377,248,374,255,372,276,368,282,365,285,359,286,357,292,350,299,344,299,321,317,313,315,306,312,298,315,288,315,275,318,267,312,261,304,254,293,246,281,236,278,235,266,244,264,259,264,250,258,259,251,261,243,259,235,261,230,264,228,268,232,267,236,268,240,273,240,278,245,284,245,296,243,306,239,303,233,308,225,300,224,299,216,296,209,290,210,285,213,282,218,276,223,269,224,265,222,259,222,253,218,247,218,237,223,233,198,241,195,246,190,248,180,251,174,258,169,267,162,271,152,279,148,282,142,283,135,290,127" shape="poly">
+                <area target="_self" alt="Incheon" title="Incheon" href="/report/?search-option=area&q=인천" coords="235,210,235,225,239,225,235,225,245,221,249,217,254,220,259,222,262,226,259,235,261,241,261,247,256,253,250,258,240,258,234,260,236,276,230,276,220,278,208,276,201,264,189,230,189,205,201,190,212,193,223,190,232,195" shape="poly">
+                <area target="_self" alt="Daejeon" title="Daejeon" href="/report/?search-option=area&q=대전" coords="350,392,346,401,344,409,346,412,342,417,335,418,330,412,326,419,323,417,314,407,320,391,327,387,329,380,334,380,335,383,344,382,346,387,344,382" shape="poly">
+                <area target="_self" alt="Sejong" title="Sejong" href="/report/?search-option=area&q=세종" coords="308,346,319,348,321,355,322,364,329,371,334,377,328,380,325,388,319,389,313,387,308,380,308,374,308,367,304,362,303,354,301,348" shape="poly">
+                <area target="_self" alt="Chungbuk" title="Chungbuk" href="/report/?search-option=area&q=충북" coords="371,281,377,284,390,282,392,276,397,270,402,274,406,277,413,275,420,274,430,275,435,277,432,282,435,285,440,283,445,286,450,290,457,291,469,294,472,296,467,301,460,304,455,310,450,315,448,322,448,329,435,328,429,324,426,326,422,330,415,330,410,334,406,336,406,339,407,347,401,345,394,345,389,349,391,354,390,357,380,358,377,361,379,364,384,366,388,370,388,373,388,375,385,378,384,380,385,388,389,396,385,403,384,406,386,407,390,405,393,406,396,409,402,410,405,411,406,413,405,418,401,420,401,431,398,435,389,441,377,443,367,441,359,435,355,425,356,416,351,412,345,410,344,404,349,395,351,390,346,387,344,382,335,381,334,375,327,367,323,362,322,356,320,348,327,342,333,343,335,339,331,333,322,324,321,319,331,310,343,300,349,299,355,296,360,287,365,285" shape="poly">
+                <area target="_self" alt="Chungnam" title="Chungnam" href="/report/?search-option=area&q=충남" coords="232,297,246,306,259,311,272,321,276,318,285,316,295,318,300,313,306,313,318,318,321,323,328,331,333,338,333,341,324,342,320,347,301,347,302,355,304,364,307,370,307,379,310,385,313,387,318,390,317,397,314,405,318,411,323,416,325,418,329,412,333,418,339,418,345,413,351,413,354,417,356,424,357,433,359,439,357,441,358,445,350,445,347,448,339,448,333,443,327,431,316,433,304,436,297,433,290,424,282,425,274,430,272,438,249,448,244,436,238,431,231,426,231,417,232,411,227,403,212,397,205,362,203,349,191,353,187,347,194,346,186,340,191,332,195,323,203,318,206,312,208,304,224,304" shape="poly">
+                <area target="_self" alt="Gangwon" title="Gangwon" href="/report/?search-option=area&q=강원" coords="437,78,454,106,469,133,470,148,480,158,483,166,516,207,518,216,526,219,528,234,534,236,536,246,542,249,544,257,551,265,553,276,551,284,544,284,543,288,544,294,538,296,527,290,515,291,508,292,499,296,489,293,486,298,482,297,476,295,462,291,450,288,443,283,433,283,432,281,436,276,430,273,419,272,412,274,407,276,398,270,395,271,392,276,389,280,383,281,377,281,372,278,374,255,378,246,377,237,377,234,386,229,382,226,370,222,357,217,351,215,351,208,348,200,348,192,351,186,357,182,356,174,349,169,344,163,340,157,337,151,327,150,321,146,323,141,319,139,315,141,311,141,305,134,301,129,301,122,315,119,344,119,371,117,377,119,393,118,407,119,417,116,427,106,431,98,431,87,432,78,437,78" shape="poly">
+                <area target="_self" alt="Gwangju" title="Gwangju" href="/report/?search-option=area&q=광주" coords="255,552,250,560,248,565,247,573,254,574,258,574,262,579,270,580,278,579,285,577,289,571,289,568,290,564,289,562,285,562,282,558,278,555,270,556,261,557" shape="poly">
+                <area target="_self" alt="Jeonbuk" title="Jeonbuk" href="/report/?search-option=area&q=전북" coords="298,436,303,437,310,435,317,433,326,432,329,437,331,444,335,448,345,451,351,448,357,446,357,441,361,439,368,442,373,444,376,444,389,443,389,451,388,460,385,465,381,469,373,472,368,477,364,485,361,495,357,500,356,506,357,511,359,514,362,520,366,527,367,530,365,532,360,537,359,541,357,554,354,547,349,543,343,541,337,540,333,544,324,544,306,545,297,546,293,541,294,536,291,533,290,527,278,532,272,525,267,522,262,525,259,531,257,539,245,542,237,546,228,545,218,541,206,534,198,520,199,501,207,477,218,468,230,450,243,448,255,448,258,445,272,440,274,431,279,428,285,425,291,426,294,431" shape="poly">
+                <area target="_self" alt="Jeonnam" title="Jeonnam" href="/report/?search-option=area&q=전남" coords="214,541,224,542,234,546,244,544,257,539,260,529,265,524,270,522,273,525,278,532,289,527,292,534,294,537,294,543,297,545,306,544,314,543,334,544,338,540,344,540,351,543,355,548,362,564,367,571,374,580,379,589,378,595,379,602,380,610,379,619,383,632,387,641,391,657,389,665,384,673,371,685,324,706,258,721,224,714,169,699,143,644,154,619,173,573,194,564" shape="poly">
+                <area target="_self" alt="Busan" title="Busan" href="/report/?search-option=area&q=부산" coords="545,531,551,534,556,539,551,545,549,549,548,552,550,559,544,563,536,566,536,573,519,582,499,592,492,580,498,575,499,570,498,566,500,565,505,563,510,556,516,554,521,554,527,546,537,540" shape="poly">
+                <area target="_self" alt="Daegu" title="Daegu" href="/report/?search-option=area&q=대구" coords="482,444,475,444,469,447,466,449,461,457,452,460,448,462,449,465,451,467,456,469,457,473,450,475,449,477,450,482,452,487,450,490,445,491,445,495,453,500,460,499,463,491,465,484,470,483,473,486,478,486,482,480,483,474,484,471,490,462,489,458,486,453,485,446" shape="poly">
+                <area target="_self" alt="Ulsan" title="Ulsan" href="/report/?search-option=area&q=울산" coords="516,508,520,514,529,518,538,523,546,529,554,537,560,536,559,521,563,515,567,520,571,510,572,499,564,491,558,491,557,493,550,494,546,488,542,486,536,486,532,489,526,495,522,498,524,501" shape="poly">
+                <area target="_self" alt="Gyeongbuk" title="Gyeongbuk" href="/report/?search-option=area&q=경북" coords="451,330,451,320,458,310,466,303,475,297,487,300,488,298,491,293,498,296,505,295,510,292,526,291,532,294,541,298,544,295,545,289,548,284,556,284,686,235,715,238,783,264,791,275,755,327,605,490,569,495,565,491,560,491,552,494,547,487,540,485,534,487,530,490,526,496,523,497,519,500,515,499,510,497,507,500,506,504,498,504,496,506,485,506,472,504,463,498,465,491,465,484,469,483,473,486,481,486,484,477,486,471,491,460,488,452,486,444,478,443,467,449,462,457,453,459,450,462,449,465,451,467,458,471,456,474,452,473,451,477,451,480,453,487,451,490,446,490,444,496,425,497,425,491,427,486,424,477,420,473,414,471,407,469,401,466,391,462,392,441,399,437,403,432,403,421,406,418,408,411,404,410,399,409,394,405,387,406,389,399,391,395,387,386,387,377,390,373,389,369,381,363,380,360,384,357,393,354,391,348,400,345,409,347,408,342,409,336,416,330,424,330,429,325,435,327,439,329" shape="poly">
+                <area target="_self" alt="Gyeongnam" title="Gyeongnam" href="/report/?search-option=area&q=경남" coords="388,632,379,620,380,607,377,593,377,586,373,578,365,567,359,557,358,543,359,536,367,530,363,523,361,514,356,508,358,498,362,491,365,482,372,471,381,468,388,463,397,466,403,469,414,470,422,476,425,483,423,492,424,496,443,496,452,500,464,500,472,505,489,505,495,507,498,504,505,505,506,499,510,498,522,501,516,506,515,510,520,515,531,521,536,524,541,525,543,532,539,538,532,541,526,546,522,552,517,554,510,556,507,559,504,564,498,565,496,568,498,570,497,575,490,580,489,587,491,600,491,614,481,630,466,637,440,648" shape="poly">
+                <area target="_self" alt="Jeju" title="Jeju" href="/report/?search-option=area&q=제주" coords="244,789,260,785,276,792,282,801,279,813,266,821,233,829,207,824,202,811,211,799,228,790" shape="poly">
+            </map>
+            <div class="sticky-top" id="desc" style="color:red; font-size:50px; z-index:1500;"></div>
+        </div>   
+    </div>
+    
     <div class="board-table row no-gutters my-4">
         <div class="notice col table-line-thick">
-            <a class="md-font text-700" href="{% url 'bestpost_list' %}">
+            <a class="md-font text-700 pl-1" href="{% url 'bestpost_list' %}">
                 베스트게시판
             </a>
         </div>
@@ -12,7 +59,7 @@
             <div class="table-line col py-2">
                 {% if bestpost.board == "Free" %}
                     <a href="{% url 'freepost_detail' pk=bestpost.pk %}">
-                        <div class="truncate d-inline-block v-align sm-font">
+                        <div class="truncate d-inline-block v-align sm-font pl-1">
                             {{ bestpost.title }}
                         </div>
                         {% if bestpost.freecomments.count %}
@@ -23,7 +70,7 @@
                     </a>
                 {% elif bestpost.board == "Report" %}
                     <a href="{% url 'reportpost_detail' pk=bestpost.pk %}">
-                        <div class="truncate d-inline-block v-align sm-font">
+                        <div class="truncate d-inline-block v-align sm-font pl-1">
                             [{{  bestpost.show_area}}] [ {{ bestpost.specific_area }} ] {{ bestpost.title }}
                         </div>
                         {% if bestpost.reportcomments.count %}
@@ -34,7 +81,7 @@
                     </a>
                 {% elif bestpost.board == "Proposal" %}
                     <a href="{% url 'proposalpost_detail' pk=bestpost.pk %}">
-                        <div class="truncate d-inline-block v-align sm-font">
+                        <div class="truncate d-inline-block v-align sm-font pl-1">
                             [{{  bestpost.show_proposal_type}}] {{ bestpost.title }}
                         </div>
                         {% if bestpost.proposalcomments.count %}
@@ -45,7 +92,7 @@
                     </a>
                 {% else %}
                     <a href="{% url 'noticepost_detail' pk=bestpost.pk %}">
-                        <div class="truncate d-inline-block v-align sm-font">
+                        <div class="truncate d-inline-block v-align sm-font pl-1">
                             {% if bestpost.notice_type == 1 %}
                                 [필독] 
                             {% endif %}
@@ -66,7 +113,7 @@
         <div class="col col-md-6">
             <div class="row no-gutters mr-md-2 my-3">
                 <div class="notice col table-line-thick">
-                    <a class="md-font text-700" href="{% url 'reportpost_list' %}">
+                    <a class="md-font text-700 pl-1" href="{% url 'reportpost_list' %}">
                         제보게시판
                     </a>
                 </div>
@@ -74,7 +121,7 @@
                 {% for reportpost in reportposts %}
                     <div class="table-line col py-2">
                         <a href="{% url 'reportpost_detail' pk=reportpost.pk %}">
-                            <div class="truncate d-inline-block v-align sm-font">
+                            <div class="truncate d-inline-block v-align sm-font pl-1">
                                 [{{ reportpost.show_area }}][{{ reportpost.specific_area }}]{{ reportpost.title }}
                             </div>
                             {% if reportpost.reportcomments.count %}
@@ -91,7 +138,7 @@
         <div class="col col-md-6">
             <div class="row no-gutters ml-md-2 my-3">
                 <div class="notice col table-line-thick">
-                    <a class="md-font text-700" href="{% url 'freepost_list' %}">
+                    <a class="md-font text-700 pl-1" href="{% url 'freepost_list' %}">
                         자유게시판
                     </a>
                 </div>
@@ -99,7 +146,7 @@
                 {% for freepost in freeposts %}
                     <div class="table-line col py-2">
                         <a href="{% url 'freepost_detail' pk=freepost.pk %}">
-                            <div class="truncate d-inline-block v-align sm-font">
+                            <div class="truncate d-inline-block v-align sm-font pl-1">
                                 {{ freepost.title }}
                             </div>
                             {% if freepost.freecomments.count %}
@@ -118,7 +165,7 @@
         <div class="col col-md-6">
             <div class="row no-gutters mr-md-2 my-3">
                 <div class="notice col table-line-thick">
-                    <a class="md-font text-700" href="{% url 'proposalpost_list' %}">
+                    <a class="md-font text-700 pl-1" href="{% url 'proposalpost_list' %}">
                         건의/신고게시판
                     </a>
                 </div>
@@ -126,7 +173,7 @@
                 {% for proposalpost in proposalposts %}
                     <div class="table-line col py-2">
                         <a href="{% url 'proposalpost_detail' pk=proposalpost.pk %}">
-                            <div class="truncate d-inline-block v-align sm-font">
+                            <div class="truncate d-inline-block v-align sm-font pl-1">
                                 [{{ proposalpost.show_proposal_type }}]{{ proposalpost.title }}
                             </div>
                             {% if proposalpost.proposalcomments.count %}
@@ -141,9 +188,9 @@
             </div>
         </div>
         <div class="col col-md-6">
-            <div class="row no-gutters mr-md-2 my-3">
+            <div class="row no-gutters ml-md-2 my-3">
                 <div class="notice col table-line-thick">
-                    <a class="md-font text-700" href="{% url 'noticepost_list' %}">
+                    <a class="md-font text-700 pl-1" href="{% url 'noticepost_list' %}">
                         공지게시판
                     </a>
                 </div>
@@ -151,7 +198,7 @@
                 {% for noticepost in noticeposts %}
                     <div class="table-line col py-2">
                         <a href="{% url 'noticepost_detail' pk=noticepost.pk %}">
-                            <div class="truncate d-inline-block v-align sm-font">
+                            <div class="truncate d-inline-block v-align sm-font pl-1">
                                 {% if noticepost.notice_type == 1 %}
                                     [필독]
                                 {% endif %}

@@ -1,90 +1,106 @@
 {% extends 'board/base.html' %}
 
 {% block content %}
-    <ul class="nav nav-tabs" style="margin-bottom:2%;">
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'member_info' member_pk=member.pk%}">회원정보</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'memberpost_list' member_pk=member.pk%}">작성 글</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link active" href="{% url 'membercomment_list' member_pk=member.pk%}">작성 댓글</a>
-        </li>
-    </ul>
-    {% if member.pk == user.pk %}
-        <h3>작성 댓글 목록</h3>
-    {% else %}
-        <h3>{{ member.nickname }}님의 작성 댓글 목록</h3>
-    {% endif %}
-    <table class="board-table">
-        <tr>
-            <th>댓글</th>
-            <th>삭제</th>
-            <th>날짜</th>
-            <th>추천/비추천</th>
-        </tr>
+    <div class="row no-gutters mt-3">
+        <ul class="nav nav-tabs col px-1 py-2" style="margin-bottom:2%;">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'member_info' member_pk=member.pk%}">회원정보</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'memberpost_list' member_pk=member.pk%}">작성 글</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url 'membercomment_list' member_pk=member.pk%}">작성 댓글</a>
+            </li>
+        </ul>
+    </div>
+    <div class="ro no-gutters">
+        <div class="colpx-1 py-2 lg-font">
+            {{ member.nickname.nickname }} 님의 작성 댓글 목록
+        </div>
+    </div>
+    <div class="board-table row no-gutters mt-3">
+        <div class="table-line-thick col-7 py-2 text-center text-700 xs-font">댓글</div>
+        <div class="table-line-thick col-2 py-2 text-center text-700 xs-font">삭제</div>
+        <div class="table-line-thick col-1 py-2 text-center text-700 xs-font">날짜</div>
+        <div class="table-line-thick col-2 py-2 text-center text-700 xs-font">추천/비추천</div>
+        <div class="w-100"></div>
         {% for membercomment in membercomments %}
-        <tr class="post-list">
-            <td class="comment-content">
+            <div class="table-line col-7 px-1 py-2">
                 {% if membercomment.post.board == "Free" %}
-                    <a href="{% url 'freepost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
+                    <a href="{% url 'freepost_detail' pk=membercomment.post.pk %}">
+                        <div class="d-inline-block v-align sm-font">
+                            {{ membercomment.content }}
+                        </div>
+                    </a>
                 {% elif membercomment.post.board == "Report" %}
-                    <a href="{% url 'reportpost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
+                    <a href="{% url 'reportpost_detail' pk=membercomment.post.pk %}">
+                        <div class="d-inline-block v-align sm-font">
+                            {{ membercomment.content }}
+                        </div>
+                    </a>
                 {% elif membercomment.post.board == "Proposal" %}
-                    <a href="{% url 'proposalpost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
+                    <a href="{% url 'proposalpost_detail' pk=membercomment.post.pk %}">
+                        <div class="d-inline-block v-align sm-font">
+                            {{ membercomment.content }}
+                        </div>
+                    </a>
                 {% else %}
-                    <a href="{% url 'noticepost_detail' pk=membercomment.post.pk %}">{{ membercomment.content }}</a>
+                    <a href="{% url 'noticepost_detail' pk=membercomment.post.pk %}">
+                        <div class="d-inline-block v-align sm-font">
+                            {{ membercomment.content }}
+                        </div>
+                    </a>
                 {% endif %}
-            </td>
-            <td class="delete-comments">
+            </div>
+            <div class="table-line col-2 py-2 text-center xs-font">
                 {% if member.pk == user.pk %}
                     {% if membercomment.post.board == "Free" %}
-                        <a href="{% url 'freecomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
+                        <a class="text-700 text-danger" href="{% url 'freecomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
                     {% elif membercomment.post.board == "Report" %}
-                        <a href="{% url 'reportcomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
+                        <a class="text-700 text-danger" href="{% url 'reportcomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
                     {% elif membercomment.post.board == "Proposal" %}
-                        <a href="{% url 'proposalcomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
+                        <a class="text-700 text-danger" href="{% url 'proposalcomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
                     {% else %}
-                        <a href="{% url 'noticecomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
+                        <a class="text-700 text-danger" href="{% url 'noticecomment_remove' pk=membercomment.pk %}" onclick="return confirm('정말 삭제하시겠습니까?')">[삭제]</a>
                     {% endif %}
                 {% endif %}
-            </td>
-            <td class="date">
+            </div>
+            <div class="table-line col-1 py-2 text-center d-inline-block d-md-none xs-font">
+                {{ membercomment.published_date_for_board_phone }}
+            </div>
+            <div class="table-line col-1 py-2 text-center d-none d-md-inline-block xs-font">
                 {{ membercomment.published_date_for_board }}
-            </td>
-            <td class="likes_and_hates_comment">
-                {{ membercomment.total_likes }} / -{{ membercomment.total_hates }}</div> 
-            </td>
-        </tr>
+            </div>
+            <div class="table-line col-2 py-2 text-center xs-font">
+                {{ membercomment.total_likes }} / -{{ membercomment.total_hates }}
+            </div>
+            <div class="w-100"></div>
         {% endfor %}
-    </table>
+    </div>
+
     <!-- pagination dispaly by Rob L from Stack Overflow -->
-    <ul class="pagination">
-        <li class="page-item"><a class="page-link" href="?page=1&q={{ q }}&search-option={{ filter_type }}">&laquo; 첫 페이지</a></li>
+    <ul class="pagination mt-5">
+        <li class="page-item"><a class="page-link" href="?page=1&q={{ q }}&member-option={{ filter_type }}">&laquo;</a></li>
         {% if membercomments.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page={{ membercomments.previous_page_number }}&q={{ q }}&search-option={{ filter_type }}">이전</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ membercomments.previous_page_number }}&q={{ q }}&member-option={{ filter_type }}">&lt;</a></li>
         {% endif %}
-        
         {% if membercomments.number|add:'-4' > 1 %}
-        <li class="page-item"><a class="page-link" href="?page={{ membercomments.number|add:'-5' }}&q={{ q }}&search-option={{ filter_type }}">&hellip;</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ membercomments.number|add:'-5' }}&q={{ q }}&member-option={{ filter_type }}">&hellip;</a></li>
         {% endif %}
-        
         {% for i in membercomments.paginator.page_range %}
             {% if membercomments.number == i %}
                 <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
             {% elif i > membercomments.number|add:'-5' and i < membercomments.number|add:'5' %}
-                <li class="page-item"><a class="page-link" href="?page={{ i }}&q={{ q }}&search-option={{ filter_type }}">{{ i }}</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ i }}&q={{ q }}&member-option={{ filter_type }}">{{ i }}</a></li>
             {% endif %}
         {% endfor %}
-        
         {% if membercomments.paginator.num_pages > membercomments.number|add:'4' %}
-            <li class="page-item"><a class="page-link" href="?page={{ membercomments.number|add:'5' }}&q={{ q }}&search-option={{ filter_type }}">&hellip;</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ membercomments.number|add:'5' }}&q={{ q }}&member-option={{ filter_type }}">&hellip;</a></li>
         {% endif %}
-
         {% if membercomments.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ membercomments.next_page_number }}&q={{ q }}&search-option={{ filter_type }}">다음</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ membercomments.next_page_number }}&q={{ q }}&member-option={{ filter_type }}">&gt;</a></li>
         {% endif %}
-        <li class="page-item"><a class="page-link" href="?page={{ membercomments.paginator.num_pages }}&q={{ q }}&search-option={{ filter_type }}">끝 페이지 &raquo;</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ membercomments.paginator.num_pages }}&q={{ q }}&member-option={{ filter_type }}">&raquo;</a></li>
     </ul>
 {% endblock %}

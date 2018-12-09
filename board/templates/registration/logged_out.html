@@ -1,7 +1,12 @@
 {% extends 'board/base.html' %}
 {% block content %}
 
-<h2>로그아웃 되었습니다. </h2>
-<p><a href="{%url 'home'%}">홈으로 돌아가기</a></p>
+    <div class="row no-gutters mt-4">
+        <div class="col px-3 py-2 lg-font">로그아웃 되었습니다.</div>
+        <div class="w-100"></div>
+        <div class="col px-3 py-2">
+            <a class="sm-font" href="{%url 'home'%}">홈으로 돌아가기</a>
+        </div>
+    </div>
 
 {% endblock %}

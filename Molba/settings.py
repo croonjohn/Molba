@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'hitcount',
+    'tinymce',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -130,3 +132,6 @@ LOGIN_REDIRECT_URL = '/'
 # django-hitcount settings
 # https://django-hitcount.readthedocs.io/en/latest/settings.html
 HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 0 }
+
+# django-cripsy settings
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

@@ -59,7 +59,8 @@ urlpatterns = [
     path('member/<member_pk>/posts/', views.memberpost_list, name='memberpost_list'),
     path('member/<member_pk>/comments/', views.membercomment_list, name='membercomment_list'),
     path('member/<member_pk>/info/', views.member_info, name='member_info'),
-    path('member/<member_pk>/info/change', views.member_info_change, name='member_info_change'),
+    path('member/<member_pk>/change_nickname', views.change_nickname, name='change_nickname'),
+    path('member/<member_pk>/change_password', views.change_password, name='change_password'),
     path('search/', views.top_search_view, name='top_search_view'),
 ]
 

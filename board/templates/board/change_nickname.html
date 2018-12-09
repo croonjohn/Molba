@@ -1,0 +1,28 @@
+{% extends 'board/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="row no-gutters py-3">
+        <div class="col text-700 lg-font">닉네임 변경</div>
+    </div>
+    <form method="POST" action="" class="signup_form row no-gutters">
+        {% csrf_token %}
+
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+        
+        <div class="col">
+            {{ form.nickname | as_crispy_field }}
+        </div>
+        <div class="w-100"></div>
+        <div class="col">
+            <input type="submit" class="save btn btn-success" value="변경" onclick="return confirm('닉네임을 변경하시겠습니까?')">
+        </div>
+        <div class="col text-right">
+            <a href="{% url 'member_info' member_pk=member_pk %}">
+                <button type="button" class="btn btn-danger">취소</button>
+            </a>
+        </div>
+    </form>
+{% endblock %}

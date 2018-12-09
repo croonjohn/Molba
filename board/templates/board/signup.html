@@ -1,18 +1,40 @@
 {% extends 'board/base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-    <h3>회원가입</h3>
-    <form method="POST" action="" class="signup_form">
+    <div class="row no-gutters py-3">
+        <div class="col text-700 lg-font">회원가입</div>
+    </div>
+    <form method="POST" action="" class="signup_form row no-gutters">
         {% csrf_token %}
-        {% for field in form %}
-            <div class="form-group">
-                {{ field.label }}
-                {{ field }}
-            </div>
+
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
         {% endfor %}
-        <input type="submit" class="save btn btn-success" value="회원가입">
-        <a href="{% url 'home' %}">
-            <button type="button" class="btn btn-danger">취소</button>
-        </a>
+        
+        <div class="col">
+            {{ form.username | as_crispy_field }}
+        </div>
+        <div class="w-100"></div>
+        <div class="col">
+            {{ nickname_form.nickname | as_crispy_field }}
+        </div>
+        <div class="w-100"></div>
+        <div class="col">
+            {{ form.password1 | as_crispy_field }}
+        </div>
+        <div class="w-100"></div>
+        <div class="col">
+            {{ form.password2 | as_crispy_field }}
+        </div>
+        <div class="w-100"></div>
+        <div class="col">
+            <input type="submit" class="save btn btn-success" value="회원가입">
+        </div>
+        <div class="col text-right">
+            <a href="{% url 'home' %}">
+                <button type="button" class="btn btn-danger">취소</button>
+            </a>
+        </div>
     </form>
 {% endblock %}

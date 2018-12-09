@@ -2,7 +2,7 @@
 {% load hitcount_tags %}
 
 {% block content %}
-    <div class="board-explanation row">
+    <div class="board-explanation row no-gutters pl-3">
         <div class="col">
             <div class="md-font text-700">베스트게시판</div>
             <div class="xs-font my-3">
@@ -12,18 +12,18 @@
         </div>
     </div>
     <div class="board-table row no-gutters">
-        <div class="table-line-thick col-1 py-2 text-center text-700 xs-font">게시판</div>
-        <div class="table-line-thick col-8 col-md-7 py-2 text-center text-700 xs-font">제목</div>
+        <div class="table-line-thick col-2 col-md-1 py-2 text-center text-700 xs-font">게시판</div>
+        <div class="table-line-thick col-7 col-md-7 py-2 text-center text-700 xs-font">제목</div>
         <div class="table-line-thick col-1 py-2 text-center text-700 xs-font d-none d-md-inline-block">글쓴이</div>
         <div class="table-line-thick col-1 py-2 text-center text-700 xs-font">날짜</div>
         <div class="table-line-thick col-1 py-2 text-center text-700 xs-font">조회</div>
         <div class="table-line-thick col-1 py-2 text-center text-700 xs-font">추천</div>
         <div class="w-100"></div>
         {% for notice_top in notice_tops %}
-            <div class="table-line notice col-1 py-2 text-center text-700 xs-font">[공지]</div>
-            <div class="table-line notice col-8 col-md-7 py-2 text-700">
+            <div class="table-line notice col-2 col-md-1 py-2 text-center text-700 xs-font">[공지]</div>
+            <div class="table-line notice col-7 col-md-7 py-2 text-700">
                 <a href="{% url 'noticepost_detail' pk=notice_top.pk %}">
-                    <div class="truncate sm-font">
+                    <div class="truncate sm-font pl-1">
                         {{ notice_top.title }}
                     </div>
                 </a>
@@ -35,29 +35,29 @@
             <div class="w-100"></div>
         {% endfor %}
         {% for bestpost in bestposts %}
-            <div class="table-line col-1 py-2 text-center text-700">
+            <div class="table-line col-2 col-md-1 py-2 text-center text-700">
                 {% if bestpost.board == "Free" %}
-                    <a class="xs-font" href="{% url 'freepost_list' %}">
+                    <a class="xxs-font" href="{% url 'freepost_list' %}">
                         [자유]
                     </a>
                 {% elif bestpost.board == "Report" %}
-                    <a class="xs-font" href="{% url 'reportpost_list' %}">
+                    <a class="xxs-font" href="{% url 'reportpost_list' %}">
                         [제보]
                     </a>
                 {% elif bestpost.board == "Proposal" %}
-                    <a class="xs-font" href="{% url 'proposalpost_list' %}">
+                    <a class="xxs-font" href="{% url 'proposalpost_list' %}">
                         [건/신]
                     </a>
                 {% else %}
-                    <a class="xs-font" href="{% url 'noticepost_list' %}">
+                    <a class="xxs-font" href="{% url 'noticepost_list' %}">
                         [공지]
                     </a>
                 {% endif %}
             </div>
-            <div class="table-line col-8 col-md-7 py-2">
+            <div class="table-line col-7 col-md-7 py-2">
                 {% if bestpost.board == "Free" %}
                     <a href="{% url 'freepost_detail' pk=bestpost.pk %}">
-                        <div class="truncate d-inline-block v-align sm-font">
+                        <div class="truncate d-inline-block v-align sm-font pl-1">
                             {{ bestpost.title }}
                         </div>
                         {% if bestpost.freecomments.count %}
@@ -68,7 +68,7 @@
                     </a>
                 {% elif bestpost.board == "Report" %}
                     <a href="{% url 'reportpost_detail' pk=bestpost.pk %}">
-                        <div class="truncate d-inline-block v-align sm-font">
+                        <div class="truncate d-inline-block v-align sm-font pl-1">
                             [{{  bestpost.show_area}}] [ {{ bestpost.specific_area }} ] {{ bestpost.title }}
                         </div>
                         {% if bestpost.reportcomments.count %}
@@ -79,7 +79,7 @@
                     </a>
                 {% elif bestpost.board == "Proposal" %}
                     <a href="{% url 'proposalpost_detail' pk=bestpost.pk %}">
-                        <div class="truncate d-inline-block v-align sm-font">
+                        <div class="truncate d-inline-block v-align sm-font pl-1">
                             [{{  bestpost.show_proposal_type}}] {{ bestpost.title }}
                         </div>
                         {% if bestpost.proposalcomments.count %}
@@ -90,7 +90,7 @@
                     </a>
                 {% else %}
                     <a href="{% url 'noticepost_detail' pk=bestpost.pk %}">
-                        <div class="truncate d-inline-block v-align sm-font">
+                        <div class="truncate d-inline-block v-align sm-font pl-1">
                             {% if bestpost.notice_type == 1 %}
                                 [필독] 
                             {% endif %}
@@ -105,7 +105,7 @@
                 {% endif %}
             </div>
             <div class="table-line col-1 py-2 text-center d-none d-md-inline-block">
-                <a class="xs-font" href="{% url 'member_info' member_pk=bestpost.author.pk %}">{{ bestpost.author.nickname }}</a>
+                <a class="xs-font" href="{% url 'member_info' member_pk=bestpost.author.pk %}">{{ bestpost.author.nickname.nickname }}</a>
             </div>
             <div class="table-line col-1 py-2 text-center d-inline-block d-md-none xs-font">
                 {{ bestpost.published_date_for_board_phone }}
