@@ -77,14 +77,16 @@
             {% endif %}
         </div>
     </div>
-
-    <div class="comment-show-hide">
-            <p>&nbsp;&nbsp;<i class="fas fa-comment-dots"> 댓글</i> : <strong>{{ reportpost.reportcomments.count }}</strong> 개</p>
+    <div class="row no-gutters">
+        <div class="col">
+            <div class="comment-show-hide">
+                    <p>&nbsp;&nbsp;<i class="fas fa-comment-dots"> 댓글</i> : <strong>{{ reportpost.reportcomments.count }}</strong> 개</p>
+            </div>
+        </div>
     </div>
-    {% for reportcomment in reportpost.reportcomments.all %}
+    {% for reportcomment in reportcomments %}
         <div class="comment row no-gutters">
             <div class="col px-3 py-2 xs-font">
-                <strong>{{ forloop.counter }}.</strong>
                 <span class="author_name"><a href="{% url 'member_info' member_pk=reportcomment.author.pk %}">{{ reportcomment.author.nickname.nickname }}</a></span>
                 <span>
                 {% if reportpost.author == reportcomment.author %}
@@ -100,8 +102,6 @@
                 </span>
                 <div class="comment-minor-info">
                     <span class="number_of_edits">수정횟수: {{ reportcomment.number_of_edits }}</span>
-                    &nbsp;
-                    <span class="last_edit_date">마지막 수정일시: {{ reportcomment.last_edit_date_for_post }}</span>
                 </div>
             </div>  
             <div class="col-4 text-right">
@@ -123,22 +123,59 @@
             <div class="col px-3 py-2">댓글이 없습니다.</div>
         </div>
     {% endfor %}
-    {% if user.is_authenticated %}
-        <form method="POST" class="post-form" action="{% url 'add_reportcomment_to_reportpost' pk=reportpost.pk %}">
-            {% csrf_token %}
-            <div class="form-row">
-                <div class="col-10">
-                    <input type="text" name="reportcomment_form" class="comment_form form-control" placeholder="댓글을 입력하세요">
-                </div>
-                <div class="col-2">
-                    <button type="submit" class="save btn btn-sm btn-outline-dark form-control" onclick="return confirm('댓글을 등록하시겠습니까?')"><i class="fas fa-pen xs-font"> 등록</i></button>
-                </div>
-            </div>
-        </form>
-    {% else %}
-        <div class="need_login"><a href="{% url 'login' %}" class="top-menu">로그인</a> 후 댓글 달기</div>
-        <hr>
-    {% endif %}
+
+    <!-- pagination dispaly by Rob L from Stack Overflow -->
+    <div class="row no-gutters">
+        <div class="col"></div>
+        <div class="col text-center">
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="?page=1">&laquo;</a></li>
+                {% if reportcomments.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ reportcomments.previous_page_number }}">&lt;</a></li>
+                {% endif %}
+                {% if reportcomments.number|add:'-4' > 1 %}
+                <li class="page-item"><a class="page-link" href="?page={{ reportcomments.number|add:'-5' }}">&hellip;</a></li>
+                {% endif %}
+                {% for i in reportcomments.paginator.page_range %}
+                    {% if reportcomments.number == i %}
+                        <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+                    {% elif i > reportcomments.number|add:'-5' and i < reportcomments.number|add:'5' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if reportcomments.paginator.num_pages > reportcomments.number|add:'4' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ reportcomments.number|add:'5' }}">&hellip;</a></li>
+                {% endif %}
+                {% if reportcomments.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ reportcomments.next_page_number }}">&gt;</a></li>
+                {% endif %}
+                <li class="page-item"><a class="page-link" href="?page={{ reportcomments.paginator.num_pages }}">&raquo;</a></li>
+            </ul>
+        </div>
+        <div class="col"></div>
+    </div>
+
+    <div class="row no-gutters">
+        <div class="col">
+            {% if user.is_authenticated %}
+                <form method="POST" class="post-form" action="{% url 'add_reportcomment_to_reportpost' pk=reportpost.pk %}">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="col-10">
+                            <input type="text" name="reportcomment_form" class="comment_form form-control" placeholder="댓글을 입력하세요">
+                        </div>
+                        <div class="col-2">
+                            <button type="submit" class="save btn btn-sm btn-outline-dark form-control" onclick="return confirm('댓글을 등록하시겠습니까?')"><i class="fas fa-pen xs-font"> 등록</i></button>
+                        </div>
+                    </div>
+                </form>
+            {% else %}
+                <div class="need_login"><a href="{% url 'login' %}" class="top-menu">로그인</a> 후 댓글 달기</div>
+                <hr>
+            {% endif %}
+        </div>
+    </div>
+
     <div class="row no-gutters">
         <div class="col text-left">
             <a class="btn btn-outline-primary text-center" href="{% url 'reportpost_list' %}"><i class="fas fa-list xs-font"> 목록</i></a>

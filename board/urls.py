@@ -62,6 +62,8 @@ urlpatterns = [
     path('member/<member_pk>/change_nickname', views.change_nickname, name='change_nickname'),
     path('member/<member_pk>/change_password', views.change_password, name='change_password'),
     path('search/', views.top_search_view, name='top_search_view'),
+    path('notification_read/', views.notification_read, name='notification_read'),
+    path('notification_read_all/', views.notification_read_all, name='notification_read_all'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

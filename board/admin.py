@@ -3,7 +3,8 @@ from .models import (
     Nickname,
     FreePost, ReportPost, ProposalPost, NoticePost, 
     FreeComment, ReportComment, ProposalComment, NoticeComment,
-    FreeImages, ReportImages, ProposalImages, NoticeImages
+    FreeImages, ReportImages, ProposalImages, NoticeImages,
+    Notification
 )
 # Register your models here.
 
@@ -23,3 +24,5 @@ admin.site.register(FreeImages)
 admin.site.register(ReportImages)
 admin.site.register(ProposalImages)
 admin.site.register(NoticeImages)
+
+admin.site.register(Notification)

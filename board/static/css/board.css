@@ -156,6 +156,23 @@
     font-size: 1.2rem;
 }
 
+.pagination {
+    display: flex;
+    justify-content: center;
+}
+
+.link {
+    color: #629DF8;
+}
+
+.link:hover, .link:focus {
+    text-decoration: underline;
+}
+
+.underline:hover, .underline:focus {
+    text-decoration: underline;
+}
+
 html {
     font-size: 0.7rem;
 }

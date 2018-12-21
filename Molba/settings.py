@@ -11,6 +11,29 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import sys
+
+# Secret key protection from Miles Steele's Blog
+def find_or_create_secret_key():
+    """ 
+    Look for secret_key.py and return the SECRET_KEY entry in it if the file exists.
+    Otherwise, generate a new secret key, save it in secret_key.py, and return the key.
+    """
+    SECRET_KEY_DIR = os.path.dirname(__file__)
+    SECRET_KEY_FILEPATH = os.path.join(SECRET_KEY_DIR, 'secret_key.py') 
+    sys.path.insert(1,SECRET_KEY_DIR) 
+
+    if os.path.isfile(SECRET_KEY_FILEPATH):
+        from secret_key import SECRET_KEY
+        return SECRET_KEY
+    else:
+        from django.utils.crypto import get_random_string
+        chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&amp;*(-_=+)'
+        new_key = get_random_string(50, chars)
+        with open(SECRET_KEY_FILEPATH, 'w') as f:
+            f.write("# Django secret key\n# Do NOT check this into version control.\n\nSECRET_KEY = '%s'\n" % new_key)
+        from secret_key import SECRET_KEY
+        return SECRET_KEY
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,12 +43,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'mj^xt!l25fw^(_-=$i-ohdk8i($@0es*egx$c5ay$%ccl417z4'
+SECRET_KEY = find_or_create_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com', '*']
+ALLOWED_HOSTS = ['127.0.0.1', '*']
 
 
 # Application definition
@@ -66,6 +89,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'board.context_processors.notification_context',
             ],
         },
     },
@@ -135,3 +159,15 @@ HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 0 }
 
 # django-cripsy settings
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+#Security settings
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+SECURE_HSTS_SECONDS = 0
+SECURE_REDIRECT_EXEMPT = []
+SECURE_SSL_HOST = None
+SECURE_SSL_REDIRECT = False

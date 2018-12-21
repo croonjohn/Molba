@@ -4,7 +4,10 @@ __pycache__
 myvenv
 db.sqlite3
 /static
+/board/static
 .DS_Store
 *.log
 uploads/
 secret_key.py
+ngrok
+/.config_secret

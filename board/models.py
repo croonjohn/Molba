@@ -2,8 +2,11 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.urls import reverse
 from tinymce.models import HTMLField
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 def user_directory_path(instance, filename):
         return 'user_{0}/{1}'.format(instance.post.author, str(timezone.localtime().strftime('%Y.%m.%d %H:%M'))+filename)
@@ -88,8 +91,6 @@ class AbstractPost(models.Model):
             return self.published_date.strftime('%H:%M')
         else:
             return self.published_date.strftime('%m.%d')
-        
-
 
 class FreePost(AbstractPost):
     likes = models.ManyToManyField(User, related_name='freepost_likes', blank=True, null=True)
@@ -105,6 +106,8 @@ class FreePost(AbstractPost):
         slug = slugify(title)
         return "freepost_images/%s-%s" % (slug, filename)
 
+    def get_absolute_url(self):
+        return reverse('free:freepost_detail', args=[self.pk])
 
 class ReportPost(AbstractPost):
     AREA_CHOICES = (
@@ -182,14 +185,14 @@ class NoticePost(AbstractPost):
     hates = models.ManyToManyField(User, related_name='noticepost_hates', blank=True, null=True)
     board = "Notice"
 
+    class Meta:
+        abstract = False
+    
     #For multiple images. By qasimalbqali from Stack Overflow
     def get_image_filename(instance, filename):
         title = instance.post.title
         slug = slugify(title)
         return "noticepost_images/%s-%s" % (slug, filename)
-
-    class Meta:
-        abstract = False
 
 class AbstractComment(AbstractPost):
     title = models.CharField(max_length=200, blank=True, null=True)
@@ -275,4 +278,15 @@ class NoticeImages(AbstractImages):
 
     class Meta:
         abstract = False
-        
+
+class Notification(models.Model):
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='notification_actor')
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='notification_recipient')
+    verb = models.CharField(max_length=100)
+    board = models.CharField(max_length=20)
+    post_id = models.IntegerField(default=0)
+    is_read = models.BooleanField(default=False)
+
+    def set_read(self):
+        self.is_read = True
+        return

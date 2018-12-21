@@ -1,36 +1,37 @@
-from django.shortcuts import render, get_object_or_404, redirect
 from .models import (
     Nickname,
     FreePost, ReportPost, ProposalPost, NoticePost, 
     FreeComment, ReportComment, ProposalComment, NoticeComment,
-    FreeImages, ReportImages, ProposalImages, NoticeImages
-    )
-from django.utils import timezone
+    FreeImages, ReportImages, ProposalImages, NoticeImages,
+    Notification
+)
 from .forms import (
     FreePostForm, ReportPostForm, ProposalPostForm, NoticePostForm,
     FreeCommentForm, ReportCommentForm, ProposalCommentForm, NoticeCommentForm,
     FreeImagesForm, ReportImagesForm, ProposalImagesForm, NoticeImagesForm,
     SignupForm, NicknameForm, ChangePasswordForm,
 )
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import login, update_session_auth_hash
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Q
+from django.forms import modelformset_factory
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 try:
     from django.utils import simplejson as json
 except ImportError:
     import json
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from hitcount.models import HitCount
 from hitcount.views import HitCountMixin
 from itertools import chain
 import operator
-from django.db.models import Q
-from django.forms import modelformset_factory
-from django.contrib import messages
 
 def freepost_list(request):
     freepost_listing = FreePost.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
@@ -307,23 +308,23 @@ def home(request):
     noticepost_listing = NoticePost.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
     noticeposts = noticepost_listing[0:5]
 
-    SE = len(ReportPost.objects.filter(area__icontains="SE"))
-    IC = len(ReportPost.objects.filter(area__icontains="IC"))
-    GG = len(ReportPost.objects.filter(area__icontains="GG"))
-    DJ = len(ReportPost.objects.filter(area__icontains="DJ"))
-    SJ = len(ReportPost.objects.filter(area__icontains="SJ"))
-    CB = len(ReportPost.objects.filter(area__icontains="CB"))
-    CN = len(ReportPost.objects.filter(area__icontains="CN"))
-    GW = len(ReportPost.objects.filter(area__icontains="GW"))
-    GJ = len(ReportPost.objects.filter(area__icontains="GJ"))
-    JB = len(ReportPost.objects.filter(area__icontains="JB"))
-    JN = len(ReportPost.objects.filter(area__icontains="JN"))
-    BS = len(ReportPost.objects.filter(area__icontains="BS"))
-    DG = len(ReportPost.objects.filter(area__icontains="DG"))
-    US = len(ReportPost.objects.filter(area__icontains="US"))
-    GB = len(ReportPost.objects.filter(area__icontains="GB"))
-    GN = len(ReportPost.objects.filter(area__icontains="GN"))
-    JJ = len(ReportPost.objects.filter(area__icontains="JJ"))
+    SE = ReportPost.objects.filter(area__icontains="SE").count()
+    IC = ReportPost.objects.filter(area__icontains="IC").count()
+    GG = ReportPost.objects.filter(area__icontains="GG").count()
+    DJ = ReportPost.objects.filter(area__icontains="DJ").count()
+    SJ = ReportPost.objects.filter(area__icontains="SJ").count()
+    CB = ReportPost.objects.filter(area__icontains="CB").count()
+    CN = ReportPost.objects.filter(area__icontains="CN").count()
+    GW = ReportPost.objects.filter(area__icontains="GW").count()
+    GJ = ReportPost.objects.filter(area__icontains="GJ").count()
+    JB = ReportPost.objects.filter(area__icontains="JB").count()
+    JN = ReportPost.objects.filter(area__icontains="JN").count()
+    BS = ReportPost.objects.filter(area__icontains="BS").count()
+    DG = ReportPost.objects.filter(area__icontains="DG").count()
+    US = ReportPost.objects.filter(area__icontains="US").count()
+    GB = ReportPost.objects.filter(area__icontains="GB").count()
+    GN = ReportPost.objects.filter(area__icontains="GN").count()
+    JJ = ReportPost.objects.filter(area__icontains="JJ").count()
 
     context = {
         'bestposts': bestposts, 'freeposts': freeposts, 'reportposts': reportposts, 
@@ -338,25 +339,45 @@ def freepost_detail(request, pk):
     freepost = get_object_or_404(FreePost, pk=pk)
     hit_count = HitCount.objects.get_for_object(freepost)
     hit_count_response = HitCountMixin.hit_count(request, hit_count)
-    return render(request, 'board/freepost_detail.html', {'freepost': freepost})
+
+    freecomment_listing=freepost.freecomments.all()
+    paginator = Paginator(freecomment_listing, 20)
+    page = request.GET.get('page')
+    freecomments = paginator.get_page(page)
+    return render(request, 'board/freepost_detail.html', {'freepost': freepost, 'freecomments': freecomments})
     
 def reportpost_detail(request, pk):
     reportpost = get_object_or_404(ReportPost, pk=pk)
     hit_count = HitCount.objects.get_for_object(reportpost)
     hit_count_response = HitCountMixin.hit_count(request, hit_count)
-    return render(request, 'board/reportpost_detail.html', {'reportpost': reportpost})
+
+    reportcomment_listing=reportpost.reportcomments.all()
+    paginator = Paginator(reportcomment_listing, 20)
+    page = request.GET.get('page')
+    reportcomments = paginator.get_page(page)
+    return render(request, 'board/reportpost_detail.html', {'reportpost': reportpost, 'reportcomments': reportcomments})
 
 def proposalpost_detail(request, pk):
     proposalpost = get_object_or_404(ProposalPost, pk=pk)
     hit_count = HitCount.objects.get_for_object(proposalpost)
     hit_count_response = HitCountMixin.hit_count(request, hit_count)
-    return render(request, 'board/proposalpost_detail.html', {'proposalpost': proposalpost})
+
+    proposalcomment_listing=proposalpost.proposalcomments.all()
+    paginator = Paginator(proposalcomment_listing, 20)
+    page = request.GET.get('page')
+    proposalcomments = paginator.get_page(page)
+    return render(request, 'board/proposalpost_detail.html', {'proposalpost': proposalpost, 'proposalcomments': proposalcomments})
 
 def noticepost_detail(request, pk):
     noticepost = get_object_or_404(NoticePost, pk=pk)
     hit_count = HitCount.objects.get_for_object(noticepost)
     hit_count_response = HitCountMixin.hit_count(request, hit_count)
-    return render(request, 'board/noticepost_detail.html', {'noticepost': noticepost})
+
+    noticecomment_listing=noticepost.noticecomments.all()
+    paginator = Paginator(noticecomment_listing, 20)
+    page = request.GET.get('page')
+    noticecomments = paginator.get_page(page)
+    return render(request, 'board/noticepost_detail.html', {'noticepost': noticepost, 'noticecomments': noticecomments})
 
 @login_required
 def freepost_new(request):
@@ -687,6 +708,17 @@ def add_freecomment_to_freepost(request, pk):
                 author = request.user,
                 content = content
             )
+            commenter = request.user
+            post_author = freepost.author
+            if commenter != post_author:
+                Notification.objects.create(
+                    actor = commenter,
+                    recipient = post_author,
+                    verb = "님이 회원님의 게시글에 댓글을 달았습니다.",
+                    board = "Free",
+                    post_id = freepost.pk,
+                    is_read = False,
+                )
             return redirect('freepost_detail', pk=freepost.pk)
     else:
         return HttpResponseBadRequest('오류가 발생했습니다. 관리자에게 문의하세요.')
@@ -705,6 +737,17 @@ def add_reportcomment_to_reportpost(request, pk):
                 author = request.user,
                 content = content
             )
+            commenter = request.user
+            post_author = reportpost.author
+            if commenter != post_author:
+                Notification.objects.create(
+                    actor = commenter,
+                    recipient = post_author,
+                    verb = "님이 회원님의 게시글에 댓글을 달았습니다.",
+                    board = "Report",
+                    post_id = reportpost.pk,
+                    is_read = False,
+                )
             return redirect('reportpost_detail', pk=reportpost.pk)
     else:
         return HttpResponseBadRequest('오류가 발생했습니다. 관리자에게 문의하세요.')
@@ -723,6 +766,17 @@ def add_proposalcomment_to_proposalpost(request, pk):
                 author = request.user,
                 content = content
             )
+            commenter = request.user
+            post_author = proposalpost.author
+            if commenter != post_author:
+                Notification.objects.create(
+                    actor = commenter,
+                    recipient = post_author,
+                    verb = "님이 회원님의 게시글에 댓글을 달았습니다.",
+                    board = "Proposal",
+                    post_id = proposalpost.pk,
+                    is_read = False,
+                )
             return redirect('proposalpost_detail', pk=proposalpost.pk)
     else:
         return HttpResponseBadRequest('오류가 발생했습니다. 관리자에게 문의하세요.')
@@ -741,6 +795,17 @@ def add_noticecomment_to_noticepost(request, pk):
                 author = request.user,
                 content = content
             )
+            commenter = request.user
+            post_author = noticepost.author
+            if commenter != post_author:
+                Notification.objects.create(
+                    actor = commenter,
+                    recipient = post_author,
+                    verb = "님이 회원님의 게시글에 댓글을 달았습니다.",
+                    board = "Notice",
+                    post_id = noticepost.pk,
+                    is_read = False,
+                )
             return redirect('noticepost_detail', pk=noticepost.pk)
     else:
         return HttpResponseBadRequest('오류가 발생했습니다. 관리자에게 문의하세요.')
@@ -765,7 +830,7 @@ def signup(request):
     
     return render(request, 'board/signup.html', {'form': form, 'nickname_form': nickname_form})
 
-# 좋아요/싫어요 기능. 출처: 초보몽키의 개발공부로그
+# 추천/비추천 기능. 출처: 초보몽키의 개발공부로그
 @login_required
 @require_POST
 def freepost_like(request):
@@ -775,16 +840,36 @@ def freepost_like(request):
         freepost = FreePost.objects.get(pk = freepost_id)
         
         if user == freepost.author:
-            message = '자신의 글은 좋아요 하실 수 없습니다'
+            message = '자신의 글은 추천 하실 수 없습니다'
         else:
             if freepost.likes.filter(id = user.id).exists():
                 freepost.likes.remove(user)
-                message = '좋아요를 취소하셨습니다'
+                message = '추천을 취소하셨습니다'
+                liker = request.user
+                post_author = freepost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = freepost.author,
+                    verb = "님이 회원님의 게시글 추천을 취소했습니다.",
+                    board = "Free",
+                    post_id = freepost.pk,
+                    is_read = False,
+                )
             elif freepost.hates.filter(id = user.id).exists():
-                message = '싫어요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '비추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 freepost.likes.add(user)
-                message = '좋아요를 누르셨습니다'
+                message = '추천을 누르셨습니다'
+                liker = request.user
+                post_author = freepost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = freepost.author,
+                    verb = "님이 회원님의 게시글을 추천했습니다.",
+                    board = "Free",
+                    post_id = freepost.pk,
+                    is_read = False,
+                )
     
     context = {'likes_count' : freepost.total_likes, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -798,16 +883,36 @@ def freepost_hate(request):
         freepost = FreePost.objects.get(pk = freepost_id)
 
         if user == freepost.author:
-            message = '자신의 글은 싫어요 하실 수 없습니다'
+            message = '자신의 글은 비추천 하실 수 없습니다'
         else:
             if freepost.hates.filter(id = user.id).exists():
                 freepost.hates.remove(user)
-                message = '싫어요를 취소하셨습니다'
+                message = '비추천을 취소하셨습니다'
+                hater = request.user
+                post_author = freepost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = freepost.author,
+                    verb = "님이 회원님의 게시글 비추천을 취소했습니다.",
+                    board = "Free",
+                    post_id = freepost.pk,
+                    is_read = False,
+                )
             elif freepost.likes.filter(id = user.id).exists():
-                message = '좋아요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 freepost.hates.add(user)
-                message = '싫어요를 누르셨습니다'
+                message = '비추천을 누르셨습니다'
+                hater = request.user
+                post_author = freepost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = freepost.author,
+                    verb = "님이 회원님의 게시글을 비추천했습니다.",
+                    board = "Free",
+                    post_id = freepost.pk,
+                    is_read = False,
+                )
     
     context = {'hates_count' : freepost.total_hates, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -821,16 +926,36 @@ def reportpost_like(request):
         reportpost = ReportPost.objects.get(pk = reportpost_id)
 
         if user == reportpost.author:
-            message = '자신의 글은 좋아요 하실 수 없습니다'
+            message = '자신의 글은 추천 하실 수 없습니다'
         else:
             if reportpost.likes.filter(id = user.id).exists():
                 reportpost.likes.remove(user)
-                message = '좋아요를 취소하셨습니다'
+                message = '추천을 취소하셨습니다'
+                liker = request.user
+                post_author = reportpost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = reportpost.author,
+                    verb = "님이 회원님의 게시글 추천을 취소했습니다.",
+                    board = "Report",
+                    post_id = reportpost.pk,
+                    is_read = False,
+                )
             elif reportpost.hates.filter(id = user.id).exists():
-                message = '싫어요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '비추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 reportpost.likes.add(user)
-                message = '좋아요를 누르셨습니다'
+                message = '추천을 누르셨습니다'
+                liker = request.user
+                post_author = reportpost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = reportpost.author,
+                    verb = "님이 회원님의 게시글을 추천했습니다.",
+                    board = "Report",
+                    post_id = reportpost.pk,
+                    is_read = False,
+                )
     
     context = {'likes_count' : reportpost.total_likes, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -844,16 +969,36 @@ def reportpost_hate(request):
         reportpost = ReportPost.objects.get(pk = reportpost_id)
 
         if user == reportpost.author:
-            message = '자신의 글은 싫어요 하실 수 없습니다'
+            message = '자신의 글은 비추천 하실 수 없습니다'
         else:
             if reportpost.hates.filter(id = user.id).exists():
                 reportpost.hates.remove(user)
-                message = '싫어요를 취소하셨습니다'
+                message = '비추천을 취소하셨습니다'
+                hater = request.user
+                post_author = reportpost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = reportpost.author,
+                    verb = "님이 회원님의 게시글 비추천을 취소했습니다.",
+                    board = "Report",
+                    post_id = reportpost.pk,
+                    is_read = False,
+                )
             elif reportpost.likes.filter(id = user.id).exists():
-                message = '좋아요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 reportpost.hates.add(user)
-                message = '싫어요를 누르셨습니다'
+                message = '비추천을 누르셨습니다'
+                hater = request.user
+                post_author = reportpost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = reportpost.author,
+                    verb = "님이 회원님의 게시글을 비추천했습니다.",
+                    board = "Report",
+                    post_id = reportpost.pk,
+                    is_read = False,
+                )
     
     context = {'hates_count' : reportpost.total_hates, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -867,16 +1012,36 @@ def proposalpost_like(request):
         proposalpost = ProposalPost.objects.get(pk = proposalpost_id)
 
         if user == proposalpost.author:
-            message = '자신의 글은 좋아요 하실 수 없습니다'
+            message = '자신의 글은 추천 하실 수 없습니다'
         else:
             if proposalpost.likes.filter(id = user.id).exists():
                 proposalpost.likes.remove(user)
-                message = '좋아요를 취소하셨습니다'
+                message = '추천을 취소하셨습니다'
+                liker = request.user
+                post_author = proposalpost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = proposalpost.author,
+                    verb = "님이 회원님의 게시글 추천을 취소했습니다.",
+                    board = "Proposal",
+                    post_id = proposalpost.pk,
+                    is_read = False,
+                )
             elif proposalpost.hates.filter(id = user.id).exists():
-                message = '싫어요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '비추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 proposalpost.likes.add(user)
-                message = '좋아요를 누르셨습니다'
+                message = '추천을 누르셨습니다'
+                liker = request.user
+                post_author = proposalpost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = proposalpost.author,
+                    verb = "님이 회원님의 게시글을 추천했습니다.",
+                    board = "Proposal",
+                    post_id = proposalpost.pk,
+                    is_read = False,
+                )
     
     context = {'likes_count' : proposalpost.total_likes, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -890,16 +1055,36 @@ def proposalpost_hate(request):
         proposalpost = ProposalPost.objects.get(pk = proposalpost_id)
 
         if user == proposalpost.author:
-            message = '자신의 글은 싫어요 하실 수 없습니다'
+            message = '자신의 글은 비추천 하실 수 없습니다'
         else:
             if proposalpost.hates.filter(id = user.id).exists():
                 proposalpost.hates.remove(user)
-                message = '싫어요를 취소하셨습니다'
+                message = '비추천을 취소하셨습니다'
+                hater = request.user
+                post_author = proposalpost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = proposalpost.author,
+                    verb = "님이 회원님의 게시글 비추천을 취소했습니다.",
+                    board = "Proposal",
+                    post_id = proposalpost.pk,
+                    is_read = False,
+                )
             elif proposalpost.likes.filter(id = user.id).exists():
-                message = '좋아요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 proposalpost.hates.add(user)
-                message = '싫어요를 누르셨습니다'
+                message = '비추천을 누르셨습니다'
+                hater = request.user
+                post_author = proposalpost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = proposalpost.author,
+                    verb = "님이 회원님의 게시글을 비추천했습니다.",
+                    board = "Proposal",
+                    post_id = proposalpost.pk,
+                    is_read = False,
+                )
     
     context = {'hates_count' : proposalpost.total_hates, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -913,16 +1098,36 @@ def noticepost_like(request):
         noticepost = NoticePost.objects.get(pk = noticepost_id)
 
         if user == noticepost.author:
-            message = '자신의 글은 좋아요 하실 수 없습니다'
+            message = '자신의 글은 추천 하실 수 없습니다'
         else:
             if noticepost.likes.filter(id = user.id).exists():
                 noticepost.likes.remove(user)
-                message = '좋아요를 취소하셨습니다'
+                message = '추천을 취소하셨습니다'
+                liker = request.user
+                post_author = noticepost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = noticepost.author,
+                    verb = "님이 회원님의 게시글 추천을 취소했습니다.",
+                    board = "Notice",
+                    post_id = noticepost.pk,
+                    is_read = False,
+                )
             elif noticepost.hates.filter(id = user.id).exists():
-                message = '싫어요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '비추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 noticepost.likes.add(user)
-                message = '좋아요를 누르셨습니다'
+                message = '추천을 누르셨습니다'
+                liker = request.user
+                post_author = noticepost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = noticepost.author,
+                    verb = "님이 회원님의 게시글을 추천했습니다.",
+                    board = "Notice",
+                    post_id = noticepost.pk,
+                    is_read = False,
+                )
     
     context = {'likes_count' : noticepost.total_likes, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -936,16 +1141,36 @@ def noticepost_hate(request):
         noticepost = NoticePost.objects.get(pk = noticepost_id)
 
         if user == noticepost.author:
-            message = '자신의 글은 싫어요 하실 수 없습니다'
+            message = '자신의 글은 비추천 하실 수 없습니다'
         else:
             if noticepost.hates.filter(id = user.id).exists():
                 noticepost.hates.remove(user)
-                message = '싫어요를 취소하셨습니다'
+                message = '비추천을 취소하셨습니다'
+                hater = request.user
+                post_author = noticepost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = noticepost.author,
+                    verb = "님이 회원님의 게시글 비추천을 취소했습니다.",
+                    board = "Notice",
+                    post_id = noticepost.pk,
+                    is_read = False,
+                )
             elif noticepost.likes.filter(id = user.id).exists():
-                message = '좋아요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 noticepost.hates.add(user)
-                message = '싫어요를 누르셨습니다'
+                message = '비추천을 누르셨습니다'
+                hater = request.user
+                post_author = noticepost.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = noticepost.author,
+                    verb = "님이 회원님의 게시글을 비추천했습니다.",
+                    board = "Notice",
+                    post_id = noticepost.pk,
+                    is_read = False,
+                )
     
     context = {'hates_count' : noticepost.total_hates, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -959,16 +1184,36 @@ def freecomment_like(request):
         freecomment = FreeComment.objects.get(pk = freecomment_id)
 
         if user == freecomment.author:
-            message = '자신의 댓글은 좋아요 하실 수 없습니다'
+            message = '자신의 댓글은 추천 하실 수 없습니다'
         else:
             if freecomment.likes.filter(id = user.id).exists():
                 freecomment.likes.remove(user)
-                message = '좋아요를 취소하셨습니다'
+                message = '추천을 취소하셨습니다'
+                liker = request.user
+                comment_author = freecomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글 추천을 취소했습니다.",
+                    board = "Free",
+                    post_id = freecomment.post.pk,
+                    is_read = False,
+                )
             elif freecomment.hates.filter(id = user.id).exists():
-                message = '싫어요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '비추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 freecomment.likes.add(user)
-                message = '좋아요를 누르셨습니다'
+                message = '추천을 누르셨습니다'
+                liker = request.user
+                comment_author = freecomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글을 추천했습니다.",
+                    board = "Free",
+                    post_id = freecomment.post.pk,
+                    is_read = False,
+                )
     
     context = {'likes_count' : freecomment.total_likes, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -982,16 +1227,36 @@ def freecomment_hate(request):
         freecomment = FreeComment.objects.get(pk = freecomment_id)
 
         if user == freecomment.author:
-            message = '자신의 댓글은 싫어요 하실 수 없습니다'
+            message = '자신의 댓글은 비추천 하실 수 없습니다'
         else:
             if freecomment.hates.filter(id = user.id).exists():
                 freecomment.hates.remove(user)
-                message = '싫어요를 취소하셨습니다'
+                message = '비추천을 취소하셨습니다'
+                hater = request.user
+                comment_author = freecomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글 비추천을 취소했습니다.",
+                    board = "Free",
+                    post_id = freecomment.post.pk,
+                    is_read = False,
+                )
             elif freecomment.likes.filter(id = user.id).exists():
-                message = '좋아요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 freecomment.hates.add(user)
-                message = '싫어요를 누르셨습니다'
+                message = '비추천을 누르셨습니다'
+                hater = request.user
+                comment_author = freecomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글을 비추천했습니다.",
+                    board = "Free",
+                    post_id = freecomment.post.pk,
+                    is_read = False,
+                )
     
     context = {'hates_count' : freecomment.total_hates, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -1005,16 +1270,36 @@ def reportcomment_like(request):
         reportcomment = ReportComment.objects.get(pk = reportcomment_id)
 
         if user == reportcomment.author:
-            message = '자신의 댓글은 좋아요 하실 수 없습니다'
+            message = '자신의 댓글은 추천 하실 수 없습니다'
         else:
             if reportcomment.likes.filter(id = user.id).exists():
                 reportcomment.likes.remove(user)
-                message = '좋아요를 취소하셨습니다'
+                message = '추천을 취소하셨습니다'
+                liker = request.user
+                comment_author = reportcomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글 추천을 취소했습니다.",
+                    board = "Report",
+                    post_id = reportcomment.post.pk,
+                    is_read = False,
+                )
             elif reportcomment.hates.filter(id = user.id).exists():
-                message = '싫어요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '비추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 reportcomment.likes.add(user)
-                message = '좋아요를 누르셨습니다'
+                message = '추천을 누르셨습니다'
+                liker = request.user
+                comment_author = reportcomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글을 추천했습니다.",
+                    board = "Report",
+                    post_id = reportcomment.post.pk,
+                    is_read = False,
+                )
     
     context = {'likes_count' : reportcomment.total_likes, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -1028,16 +1313,36 @@ def reportcomment_hate(request):
         reportcomment = ReportComment.objects.get(pk = reportcomment_id)
 
         if user == reportcomment.author:
-            message = '자신의 댓글은 싫어요 하실 수 없습니다'
+            message = '자신의 댓글은 비추천 하실 수 없습니다'
         else:
             if reportcomment.hates.filter(id = user.id).exists():
                 reportcomment.hates.remove(user)
-                message = '싫어요를 취소하셨습니다'
+                message = '비추천을 취소하셨습니다'
+                hater = request.user
+                comment_author = reportcomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글 비추천을 취소했습니다.",
+                    board = "Report",
+                    post_id = reportcomment.post.pk,
+                    is_read = False,
+                )
             elif reportcomment.likes.filter(id = user.id).exists():
-                message = '좋아요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 reportcomment.hates.add(user)
-                message = '싫어요를 누르셨습니다'
+                message = '비추천을 누르셨습니다'
+                hater = request.user
+                comment_author = reportcomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글을 비추천했습니다.",
+                    board = "Report",
+                    post_id = reportcomment.post.pk,
+                    is_read = False,
+                )
     
     context = {'hates_count' : reportcomment.total_hates, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -1051,16 +1356,36 @@ def proposalcomment_like(request):
         proposalcomment = ProposalComment.objects.get(pk = proposalcomment_id)
 
         if user == proposalcomment.author:
-            message = '자신의 댓글은 좋아요 하실 수 없습니다'
+            message = '자신의 댓글은 추천 하실 수 없습니다'
         else:
             if proposalcomment.likes.filter(id = user.id).exists():
                 proposalcomment.likes.remove(user)
-                message = '좋아요를 취소하셨습니다'
+                message = '추천을 취소하셨습니다'
+                liker = request.user
+                comment_author = proposalcomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글 추천을 취소했습니다.",
+                    board = "Proposal",
+                    post_id = proposalcomment.post.pk,
+                    is_read = False,
+                )
             elif proposalcomment.hates.filter(id = user.id).exists():
-                message = '싫어요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '비추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 proposalcomment.likes.add(user)
-                message = '좋아요를 누르셨습니다'
+                message = '추천을 누르셨습니다'
+                liker = request.user
+                comment_author = proposalcomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글을 추천했습니다.",
+                    board = "Proposal",
+                    post_id = proposalcomment.post.pk,
+                    is_read = False,
+                )
     
     context = {'likes_count' : proposalcomment.total_likes, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -1074,16 +1399,36 @@ def proposalcomment_hate(request):
         proposalcomment = ProposalComment.objects.get(pk = proposalcomment_id)
 
         if user == proposalcomment.author:
-            message = '자신의 댓글은 싫어요 하실 수 없습니다'
+            message = '자신의 댓글은 비추천 하실 수 없습니다'
         else:
             if proposalcomment.hates.filter(id = user.id).exists():
                 proposalcomment.hates.remove(user)
-                message = '싫어요를 취소하셨습니다'
+                message = '비추천을 취소하셨습니다'
+                hater = request.user
+                comment_author = proposalcomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글 비추천을 취소했습니다.",
+                    board = "Proposal",
+                    post_id = proposalcomment.post.pk,
+                    is_read = False,
+                )
             elif proposalcomment.likes.filter(id = user.id).exists():
-                message = '좋아요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 proposalcomment.hates.add(user)
-                message = '싫어요를 누르셨습니다'
+                message = '비추천을 누르셨습니다'
+                hater = request.user
+                comment_author = proposalcomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글을 비추천했습니다.",
+                    board = "Proposal",
+                    post_id = proposalcomment.post.pk,
+                    is_read = False,
+                )
     
     context = {'hates_count' : proposalcomment.total_hates, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -1097,16 +1442,36 @@ def noticecomment_like(request):
         noticecomment = NoticeComment.objects.get(pk = noticecomment_id)
 
         if user == noticecomment.author:
-            message = '자신의 댓글은 좋아요 하실 수 없습니다'
+            message = '자신의 댓글은 추천 하실 수 없습니다'
         else:
             if noticecomment.likes.filter(id = user.id).exists():
                 noticecomment.likes.remove(user)
-                message = '좋아요를 취소하셨습니다'
+                message = '추천을 취소하셨습니다'
+                liker = request.user
+                comment_author = noticecomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글 추천을 취소했습니다.",
+                    board = "Notice",
+                    post_id = noticecomment.post.pk,
+                    is_read = False,
+                )
             elif noticecomment.hates.filter(id = user.id).exists():
-                message = '싫어요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '비추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 noticecomment.likes.add(user)
-                message = '좋아요를 누르셨습니다'
+                message = '추천을 누르셨습니다'
+                liker = request.user
+                comment_author = noticecomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글을 추천했습니다.",
+                    board = "Notice",
+                    post_id = noticecomment.post.pk,
+                    is_read = False,
+                )
     
     context = {'likes_count' : noticecomment.total_likes, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -1120,16 +1485,36 @@ def noticecomment_hate(request):
         noticecomment = NoticeComment.objects.get(pk = noticecomment_id)
 
         if user == noticecomment.author:
-            message = '자신의 댓글은 싫어요 하실 수 없습니다'
+            message = '자신의 댓글은 비추천 하실 수 없습니다'
         else:
             if noticecomment.hates.filter(id = user.id).exists():
                 noticecomment.hates.remove(user)
-                message = '싫어요를 취소하셨습니다'
+                message = '비추천을 취소하셨습니다'
+                hater = request.user
+                comment_author = noticecomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글 비추천을 취소했습니다.",
+                    board = "Notice",
+                    post_id = noticecomment.post.pk,
+                    is_read = False,
+                )
             elif noticecomment.likes.filter(id = user.id).exists():
-                message = '좋아요를 취소한 후 좋아요를 누르실 수 있습니다'
+                message = '추천을 취소한 후 추천을 누르실 수 있습니다'
             else:
                 noticecomment.hates.add(user)
-                message = '싫어요를 누르셨습니다'
+                message = '비추천을 누르셨습니다'
+                hater = request.user
+                comment_author = noticecomment.author
+                Notification.objects.create(
+                    actor = user,
+                    recipient = comment_author,
+                    verb = "님이 회원님의 댓글을 비추천했습니다.",
+                    board = "Notice",
+                    post_id = noticecomment.post.pk,
+                    is_read = False,
+                )
     
     context = {'hates_count' : noticecomment.total_hates, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
@@ -1314,3 +1699,30 @@ def top_search_view(request):
     page = request.GET.get('page')
     searchposts = paginator.get_page(page)
     return render(request, 'board/searchpost_list.html', {'searchposts': searchposts, 'q': filter_content})
+
+@login_required
+@require_POST
+def notification_read(request):
+    if request.method == 'POST':
+        notification_id = request.POST.get('pk', None)
+        notification = get_object_or_404(Notification, pk=notification_id)
+        notification.is_read = True
+        notification.save()
+        context = {}
+        return HttpResponse(json.dumps(context), content_type='application/json')
+
+@login_required
+def notification_read_all(request):
+    if request.method == 'POST':
+        notification_recipient= request.user
+        notifications = Notification.objects.filter(
+            recipient = notification_recipient
+            ).filter(
+                is_read = False,
+            )
+        for notification in notifications:
+            notification.is_read = True
+            notification.save()
+        context = {}
+        return HttpResponse(json.dumps(context), content_type='application/json')
+
