@@ -11,3 +11,4 @@ uploads/
 secret_key.py
 ngrok
 /.config_secret
+.static_root/
