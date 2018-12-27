@@ -110,7 +110,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'HOST': 'molbadbinstance.ckgdttetzwot.ap-northeast-2.rds.amazonaws.com',
-        'NAME': 'molbadatabse',
+        'NAME': 'molbadatabase',
         'PORT': '3306',
         'NAME': 'molbadbinstance',
         'USER': 'molbacreator',
