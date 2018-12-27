@@ -112,7 +112,6 @@ DATABASES = {
         'HOST': 'molbadbinstance.ckgdttetzwot.ap-northeast-2.rds.amazonaws.com',
         'NAME': 'molbadatabase',
         'PORT': '3306',
-        'NAME': 'molbadbinstance',
         'USER': 'molbacreator',
         'PASSWORD': 'df291028!',
     }
