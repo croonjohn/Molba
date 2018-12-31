@@ -8,3 +8,4 @@ db.sqlite3
 secret_key.py
 ngrok
 Molba/settings
+.config_secret
