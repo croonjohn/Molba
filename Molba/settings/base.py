@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'hitcount',
     'tinymce',
     'crispy_forms',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -155,11 +156,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_DIR = os.path.join(BASE_DIR, 'static')
+STATIC_DIR = os.path.join(ROOT_DIR, 'static')
 STATICFILES_DIRS = [
     STATIC_DIR,
 ]
-STATIC_ROOT = os.path.join(ROOT_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -172,6 +172,13 @@ HITCOUNT_KEEP_HIT_ACTIVE = { 'days': 0 }
 
 # django-cripsy settings
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+#S3 Storage settings
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_ACCESS_KEY_ID = 'AKIAJLAKTBAWXOBTIG6Q'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'molba-s3'
 
 #Security settings
 SESSION_COOKIE_SECURE = True
