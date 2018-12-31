@@ -176,8 +176,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 #S3 Storage settings
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-AWS_ACCESS_KEY_ID = 'AKIAJLAKTBAWXOBTIG6Q'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = 'AKIAIUMG5P4I7L3XCALA'
+AWS_SECRET_ACCESS_KEY = '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'
 AWS_STORAGE_BUCKET_NAME = 'molba-s3'
 
 #Security settings

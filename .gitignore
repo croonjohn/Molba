@@ -7,3 +7,4 @@ db.sqlite3
 *.log
 secret_key.py
 ngrok
+base.py
